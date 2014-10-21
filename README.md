@@ -3,4 +3,4 @@ web-tech
 
 Anforderungen
 -------------
-Für die Anforderungsliste [siehe Requirements.md](doku/Requirements.md)
+Für die Anforderungsliste [siehe requirements.md](doku/requirements.md) im Dokumentationsverzeichnis.
