@@ -9,8 +9,7 @@ Requirements Web-Tech
 + Kontodetails bearbeiten
 + Konto löschen
 + Dateiverwaltung
-+ Speichern der Dateien nicht lokal sondern bei min. einem ext. Anbieter (z.B. Dropbox oder GoogleDrive)
-+ 
++ Speichern der Dateien nicht lokal sondern bei min. einem ext. Anbieter (z.B. Dropbox oder GoogleDrive) 
 
 Geplante Features für die Zukunft
 ---------------------------------
