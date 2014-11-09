@@ -9,21 +9,29 @@ import java.security.SecureRandom;
 import play.i18n.Messages;
 import service.Mailer;
 
-public class User extends Controller {
+public class Account extends Controller {
+
+    public static Result login() {
+        return ok();
+    }
+
+    public static Result logout() {
+        return ok();
+    }
 
     /*
     Aufruf wenn der Benutzer sich am System registrieren möchte
      */
     public static Result register() {
 
-        generateCode Code = new User().new generateCode();
-        String url = controllers.routes.User.activation(Code.generate()).absoluteURL(request());
+        generateCode Code = new Account().new generateCode();
+        String url = controllers.routes.Account.activation(Code.generate()).absoluteURL(request());
         String data = Messages.get("user.activation.email.text", url);
         Config conf = ConfigFactory.load();
 
         new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.sent"), data).send();
 
-        return ok(views.html.user.register.render("Danke"));
+        return ok(views.html.account.register.render("Danke"));
     }
 
     /*
@@ -33,7 +41,7 @@ public class User extends Controller {
     public static Result activation(String key) {
         //TODO: Den Key gegen eine Datenbank prüfen
         if (key.isEmpty()) {
-            return ok(views.html.user.activation.render(Messages.get("user.activation.invalidkey")));
+            return ok(views.html.account.activation.render(Messages.get("user.activation.invalidkey")));
         }
 
         Config conf = ConfigFactory.load();
@@ -42,9 +50,12 @@ public class User extends Controller {
         new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
 
 
-        return ok(views.html.user.activation.render(Messages.get("user.activation.successfull")));
+        return ok(views.html.account.activation.render(Messages.get("user.activation.successfull")));
     }
 
+    /**
+     * Gibt einen 32 Stelligen Zufallscode zurück
+     */
     private final class generateCode {
         private SecureRandom random = new SecureRandom();
 
