@@ -7,7 +7,7 @@ import play.mvc.Result;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import play.i18n.Messages;
-import models.Mailer;
+import service.Mailer;
 
 public class User extends Controller {
 
