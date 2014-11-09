@@ -1,0 +1,8 @@
+user.activation.register=Registrierung
+user.activation.activation=Aktivierung
+user.activation.successfull=Vielen Dank! Die Aktivierung war erfolgreich!
+user.activation.invalidkey=Ungültiger Aktivierungsschlüssel
+user.activation.success=Die Aktivierung Ihres Kontos war erfolgreich! Wir wünschen Ihnen viel Spaß!
+user.activation.email.text=Die Registrierung war erfolgreich! Bitte aktivieren Sie Ihr Konto mit dem folgenden Link: {0}
+user.activation.email.subject.sent=[web-tech-project] Ihre Registrierung beim web-tech project
+user.activation.email.subject.success=[web-tech-project] Ihr Account wurde freigeschaltet

@@ -2,24 +2,46 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-    <title>@title</title>
-    <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")'>
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")">
-    <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
-    <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
-    <script type='text/javascript' src='@routes.Assets.at("javascripts/main.js")'></script>
-</head>
-<body>
-    <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container-fluid">
-                <a id="titleLink" class="brand" href="/">@title</a>
+    <head>
+        <title>@title | web-tech</title>
+        <meta charset="UTF-8">
+        <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")'>
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")">
+            <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+
+            <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+
+            <!-- ToDO: Richtige CDN Dateien einbinden -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/main.js")'></script>
+    </head>
+    <body>
+        <div class="container">
+            <div id="greets" class="row" >
+                <div id="login">
+                    <h1 class="headline">Login</h1>
+                    <form action="http://htwg-konstanz.de">
+                        <p><input type="text" name="foobar" class="placeholder" placeholder="Benutzername"></p>
+                        <p><input type="text" name="foobar" class="placeholder" placeholder="Password"></p>
+                        <p><input type="checkbox" name="Login">
+                            <span id="log">Eingeloggt bleiben?</span></p>
+                        <p> <input type="submit" class="btn btn-default" name="Anmelden"value="Anmelden"></p>
+                    </form>
+                    <a class="links" href="www.htwg-konstanz.de">Noch nicht registriert?</a>
+                </div>
+            </div>
+            <div class="footer">
+            <div class="container">
+                <footer class="h">
+                    Copyright by "web tech project 2014" |
+                    <a class="links" href="www.htwg-konstanz.de">AGB</a> |
+                    <a class="links" href="www.htwg-konstanz.de">Impressum</a>
+                </footer>
             </div>
         </div>
-    </div>
-    <div class="container">
-        @content
-    </div>
-</body>
+        </div>
+    </body>
 </html>
+
