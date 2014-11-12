@@ -25,8 +25,8 @@ public class Account extends Controller {
         String url = controllers.routes.Account.activation(Code.generate()).absoluteURL(request());
         String data = Messages.get("user.activation.email.text", url);
         Config conf = ConfigFactory.load();
-
-        new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.sent"), data).send();
+        //TODO: Den Mailer aktivieren
+        //new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.sent"), data).send();
 
         return ok(views.html.account.register.render("Danke"));
     }
@@ -40,7 +40,8 @@ public class Account extends Controller {
         Config conf = ConfigFactory.load();
         String data = Messages.get("user.activation.success");
 
-        new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
+        //TODO: Den Mailer aktivieren
+        //new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
 
         return ok(views.html.account.activation.render(Messages.get("user.activation.successfull")));
     }
