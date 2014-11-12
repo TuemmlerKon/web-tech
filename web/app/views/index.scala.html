@@ -1,22 +1,9 @@
 @(message: String)
 
-@main(message) {
+@import play.i18n.Messages
 
-    <div class="login">
-        <h1>@message</h1>
-        <form action="http://htwg-konstanz.de">
-            <input name="foobar" placeholder="Benutzername" />
-            <br/>
-            <input name="foobar" placeholder="Password" />
-            <p>Eingeloggt bleiben? <input type="checkbox"name="Loggin" > </p>
-            <p> <input type="submit" name="Anmelden"value="Anmelden"</p>
-        </form>
-        <a href="@controllers.routes.Account.register">Noch nicht registriert?</a>
-        <br />
-        <a href="@controllers.routes.Application.gtc">Allgemeine Geschäftsbedienungen</a>
-        <br />
-        <a href="@controllers.routes.Application.imprint">Imperessum</a>
-        <footer>Copyright by "web tech project"</footer>
+@main(Messages.get("user.login.title")) {
+    <div class="container">
+        nix los
     </div>
-
 }

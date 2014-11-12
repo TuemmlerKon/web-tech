@@ -1,0 +1,31 @@
+@(message: String)
+
+@import play.i18n.Messages
+
+@nouser(Messages.get("user.login.title")) {
+    <div class="container">
+        <form class="form-signin" role="form">
+            <h2 class="form-signin-heading"><span class="glyphicon glyphicon-cloud"></span></h2>
+            <h2 class="form-signin-heading">@Messages.get("user.login.title")</h2>
+            <div class="input-group">
+                <span class="input-group-addon">@@</span>
+                    <input type="email" class="form-control" placeholder="@Messages.get("user.login.email")" required autofocus>
+            </div>
+            <div class="input-group password">
+                <span class="input-group-addon glyphicon glyphicon-eye-open"></span>
+                <input type="password" class="form-control" placeholder="@Messages.get("user.login.password")" required>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="remember-me"> @Messages.get("user.login.rememberme")
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">@Messages.get("user.login.signin")</button>
+            <ul class="infolinks">
+                <li><a class="brand" href="@routes.Account.register()">@Messages.get("user.login.notregistered")</a></li>
+                <li><a class="brand" href="#">@Messages.get("application.general.gtc")</a></li>
+                <li><a class="brand" href="#">@Messages.get("application.general.imprint")</a></li>
+            </ul>
+        </form>
+    </div>
+}

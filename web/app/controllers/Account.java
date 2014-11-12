@@ -12,16 +12,13 @@ import service.Mailer;
 public class Account extends Controller {
 
     public static Result login() {
-        return ok();
+        return ok(views.html.account.login.render("SAd"));
     }
 
     public static Result logout() {
-        return ok();
+        return ok(views.html.account.login.render("SAd"));
     }
 
-    /*
-    Aufruf wenn der Benutzer sich am System registrieren möchte
-     */
     public static Result register() {
 
         generateCode Code = new Account().new generateCode();
@@ -34,10 +31,6 @@ public class Account extends Controller {
         return ok(views.html.account.register.render("Danke"));
     }
 
-    /*
-    Der Benutzer aktiviert sein Konto
-     */
-
     public static Result activation(String key) {
         //TODO: Den Key gegen eine Datenbank prüfen
         if (key.isEmpty()) {
@@ -49,14 +42,11 @@ public class Account extends Controller {
 
         new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
 
-
         return ok(views.html.account.activation.render(Messages.get("user.activation.successfull")));
     }
 
-    /**
-     * Gibt einen 32 Stelligen Zufallscode zurück
-     */
     private final class generateCode {
+
         private SecureRandom random = new SecureRandom();
 
         public String generate() {
