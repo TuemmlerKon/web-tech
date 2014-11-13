@@ -12,11 +12,11 @@ import service.Mailer;
 public class Account extends Controller {
 
     public static Result login() {
-        return ok(views.html.account.login.render("SAd"));
+        return ok(views.html.account.login.render(Messages.get("application.general.login")));
     }
 
     public static Result logout() {
-        return ok(views.html.account.login.render("SAd"));
+        return ok(views.html.account.login.render(Messages.get("application.general.logout")));
     }
 
     public static Result register() {
