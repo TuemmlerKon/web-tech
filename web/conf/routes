@@ -3,6 +3,8 @@
 # ~~~~
 
 GET        /                        controllers.Application.index()
+GET        /meine-dateien           controllers.Application.myfiles()
+GET        /einstellungen           controllers.Application.settings()
 GET        /agb                     controllers.Application.gtc()
 GET        /impressum               controllers.Application.imprint()
 GET        /registrierung           controllers.Account.register()

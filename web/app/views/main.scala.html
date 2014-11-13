@@ -10,22 +10,22 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">CloudPlex Project</a>
+                <a class="navbar-brand" href="@routes.Application.index()">CloudPlex Project</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Dashboard</a></li>
-                    <li><a href="#">Meine Dateien</a></li>
-                    <li><a href="#">Einstellungen</a></li>
+                    <li class="active"><a href="@routes.Application.index()">Dashboard</a></li>
+                    <li><a href="@routes.Application.myfiles()">Meine Dateien</a></li>
+                    <li><a href="@routes.Application.settings()">Einstellungen</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">AGB</a></li>
-                    <li><a href="#">Impressum</a></li>
+                    <li><a href="@routes.Application.gtc()">AGB</a></li>
+                    <li><a href="@routes.Application.imprint()">Impressum</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">BENUTZERNAME <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Einstellungen</a></li>
-                            <li><a href="#">abmelden</a></li>
+                            <li><a href="@routes.Application.settings()">Einstellungen</a></li>
+                            <li><a href="@routes.Account.logout()">abmelden</a></li>
                         </ul>
                     </li>
                 </ul>

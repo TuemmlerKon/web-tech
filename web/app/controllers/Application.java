@@ -17,4 +17,11 @@ public class Application extends Controller {
         return ok(views.html.index.render("Impresssum"));
     }
 
+    public static Result settings() {
+        return ok(views.html.settings.render("Einstellungen"));
+    }
+    public static Result myfiles() {
+        return ok(views.html.myfiles.render("Meine Dateien"));
+    }
+
 }

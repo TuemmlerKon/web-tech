@@ -2,11 +2,9 @@
 
 @import play.i18n.Messages
 
-@percent = {40}
-@filescount = {34}
-@sumspace = {8 GByte}
-@servicescount = {3}
-@lastlogin = {Montag, den 01. Januar 1970}
+@percent = {80}
+@lastloginday = {Montag, den 01. Januar 1970}
+@lastlogintime = {14:30}
 
 @main(Messages.get("user.login.title")) {
 
@@ -15,7 +13,7 @@
             <h3 class="panel-title">Willkommen, BENUTZERNAME</h3>
         </div>
         <div class="panel-body">
-            <p>Dein letzter Login war am <strong>@{lastlogin}</strong></p>
+            <p>Dein letzter Login war am <strong>@{lastloginday}</strong> um <strong>@{lastlogintime} Uhr</strong></p>
         </div>
     </div>
 
@@ -25,8 +23,8 @@
         </div>
         <div class="panel-body">
             <div class="progress">
-                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                    40%
+                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" style="width: @percent%">
+                    @percent%
                 </div>
             </div>
         </div>

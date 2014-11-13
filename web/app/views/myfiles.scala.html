@@ -1,0 +1,43 @@
+@(message: String)
+
+@import play.i18n.Messages
+
+@main(Messages.get("user.login.title")) {
+
+        <ol class="breadcrumb">
+            <li class="text-muted">Du bist Hier:</li>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Library</a></li>
+            <li class="active">Data</li>
+        </ol>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Dateiname</th>
+                    <th>Größe</th>
+                    <th>Service</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>20.05.2014 13:45 Uhr</td>
+                    <td>Testdatei01.txt</td>
+                    <td>54 KBytes</td>
+                    <td>Dropbox</td>
+                </tr>
+                <tr>
+                    <td>21.05.2014 13:45 Uhr</td>
+                    <td>Testdatei02.txt</td>
+                    <td>154 KBytes</td>
+                    <td>Dropbox</td>
+                </tr>
+                <tr>
+                    <td>22.05.2014 13:45 Uhr</td>
+                    <td>Testdatei03.txt</td>
+                    <td>234 KBytes</td>
+                    <td>Dropbox</td>
+                </tr>
+            </tbody>
+        </table>
+}
