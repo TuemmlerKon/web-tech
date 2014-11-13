@@ -10,12 +10,77 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Einstellungen</h3>
+            <h3 class="panel-title">@Messages.get("user.settings.changepwd")</h3>
         </div>
         <div class="panel-body">
-            <p>Einstellungen</p>
+            <form class="form-changepassword" role="form">
+                <div class="input-group">
+                    <input type="password" class="form-control" placeholder="@Messages.get("user.settings.oldpassword")" required autofocus>
+                </div>
+                <div class="input-group">
+                    <input type="password" class="form-control" placeholder="@Messages.get("user.settings.password")" required autofocus>
+                </div>
+                <div class="input-group password">
+                    <input type="password" class="form-control" placeholder="@Messages.get("user.settings.password2")" required>
+                </div>
+                <button class="btn btn-sm btn-primary btn-block" type="submit"><span class="fa fa-pencil"></span> @Messages.get("user.settings.change")</button>
+            </form>
         </div>
     </div>
 
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">@Messages.get("user.settings.delete")</h3>
+        </div>
+        <div class="panel-body">
+            <p>Wenn du dein Konto bei uns löschen möchtest, kannst du das tun, indem du auf den Button "Konto jetzt löschen" klickst.
+                Die von uns erstellten Dateien bei deinen Cloud-Anbietern werden dann automatisch gelöscht. Wenn du das nicht möchtest,
+                dann solltest du deine Dateien vorher senden (denke aber an die Verschlüsselung).</p>
+            <p>Bei Fragen sende einfach eine E-Mail an <a href="#">hilfe@@projekt-web-tech.de</a></p>
+            <form class="form-deleteaccount" role="form">
+                <button class="btn btn-sm btn-danger btn-block" type="submit"><span class="fa fa-remove"></span> @Messages.get("user.settings.deleteaccount")</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">@Messages.get("user.settings.cloudaccounts")</h3>
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="cloud-account-checkbox master"></th>
+                        <th>@Messages.get("user.settings.cloudaccounts.service")</th>
+                        <th>@Messages.get("user.settings.cloudaccounts.user")</th>
+                        <th>@Messages.get("user.settings.cloudaccounts.storageavailable")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="cloud-account-checkbox"></td>
+                        <td>Dropbox</td>
+                        <td>foobar@@gmx.com</td>
+                        <td>30 %</td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="cloud-account-checkbox"></td>
+                        <td>Google-Drive</td>
+                        <td>google@@gmail.com</td>
+                        <td>65 %</td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="cloud-account-checkbox"></td>
+                        <td>OneDrive</td>
+                        <td>someone@@microsoft.com</td>
+                        <td>10 %</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pull-left"><button class="btn btn-sm btn-danger"><span class="fa fa-remove"></span> @Messages.get("user.settings.cloudaccounts.removeselected")</button></div>
+            <div class="pull-right"><button class="btn btn-sm btn-info"><span class="fa fa-plus"></span> @Messages.get("user.settings.cloudaccounts.addaccount")</button></div>
+        </div>
+    </div>
 
 }
