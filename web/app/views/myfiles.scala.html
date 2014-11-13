@@ -7,36 +7,37 @@
         <ol class="breadcrumb">
             <li class="text-muted"><span class="fa fa-folder"></span></li>
             <li><a href="#">Home</a></li>
-            <li><a href="#">Library</a></li>
-            <li class="active">Data</li>
+            <li><a href="#">Testordner</a></li>
+            <li class="active">Textdateien</li>
         </ol>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Datum</th>
-                    <th>Dateiname</th>
-                    <th>Größe</th>
-                    <th>Service</th>
+                    <th><input type="checkbox" class="multi-checkbox master"></th>
+                    <th>@Messages.get("user.files.filename")</th>
+                    <th>@Messages.get("user.files.size")</th>
+                    <th>@Messages.get("user.files.service")</th>
+                    <th>@Messages.get("user.files.options")</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>20.05.2014 13:45 Uhr</td>
+                    <td><input type="checkbox" class="multi-checkbox"></td>
                     <td>Testdatei01.txt</td>
                     <td>54 KBytes</td>
                     <td>Dropbox</td>
+                    <td>
+                        <a href="#" title="@Messages.get("user.files.options.delete")"><span class="fa fa-remove"></span></a>
+                    </td>
                 </tr>
                 <tr>
-                    <td>21.05.2014 13:45 Uhr</td>
+                    <td><input type="checkbox" class="multi-checkbox"></td>
                     <td>Testdatei02.txt</td>
-                    <td>154 KBytes</td>
-                    <td>Dropbox</td>
-                </tr>
-                <tr>
-                    <td>22.05.2014 13:45 Uhr</td>
-                    <td>Testdatei03.txt</td>
-                    <td>234 KBytes</td>
-                    <td>Dropbox</td>
+                    <td>123 KBytes</td>
+                    <td>OneDrive</td>
+                    <td>
+                        <a href="#" title="@Messages.get("user.files.options.delete")"><span class="fa fa-remove"></span></a>
+                    </td>
                 </tr>
             </tbody>
         </table>
