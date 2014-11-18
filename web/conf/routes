@@ -5,6 +5,7 @@
 GET        /                        controllers.Application.index()
 GET        /meine-dateien           controllers.Application.myfiles()
 GET        /einstellungen           controllers.Application.settings()
+POST       /einstellungen/test      controllers.Application.test()
 GET        /agb                     controllers.Application.gtc()
 GET        /impressum               controllers.Application.imprint()
 GET        /registrierung           controllers.Account.register()
@@ -16,3 +17,4 @@ GET        /aktivierung/:key        controllers.Account.activation(key: String)
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file            controllers.Assets.at(path="/public", file)
 GET        /webjars/*file           controllers.WebJarAssets.at(file)
+->         /auth                    securesocial.Routes

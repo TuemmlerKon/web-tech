@@ -20,9 +20,16 @@
                     <th>@Messages.get("user.files.options")</th>
                 </tr>
             </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <button type="button" class="btn btn-danger btn-sm pull-right" id="deleteselected" data-url="@routes.Application.test()">@Messages.get("user.files.options.deleteselected")</button>
+                    </td>
+                </tr>
+            </tfoot>
             <tbody>
                 <tr>
-                    <td><input type="checkbox" class="multi-checkbox"></td>
+                    <td><input type="checkbox" class="multi-checkbox" data-value="Testdatei01.txt"></td>
                     <td>Testdatei01.txt</td>
                     <td>54 KBytes</td>
                     <td>Dropbox</td>
@@ -31,7 +38,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="checkbox" class="multi-checkbox"></td>
+                    <td><input type="checkbox" class="multi-checkbox" data-value="Testdatei02.txt"></td>
                     <td>Testdatei02.txt</td>
                     <td>123 KBytes</td>
                     <td>OneDrive</td>

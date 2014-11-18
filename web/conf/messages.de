@@ -45,3 +45,4 @@ user.files.service=Hoster
 user.files.size=Größe
 user.files.options=Optionen
 user.files.options.delete=Datei löschen
+user.files.options.deleteselected=Auswahl löschen

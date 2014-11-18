@@ -1,0 +1,9 @@
+@(files: String = "")
+
+<p>
+    <ul>
+        @for(file <- files) {
+            <li>@file</li>
+        }
+    </ul>
+</p>
