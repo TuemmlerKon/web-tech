@@ -35,7 +35,7 @@ public class Application extends Controller {
     }
 
     public static Result index() {
-        return ok(views.html.index.render(Messages.get("application.general.index"), News.find.all()));
+        return ok(views.html.index.render(Messages.get("application.general.index"), News.find.all(), File.find.all()));
     }
 
     public static Result test() {
