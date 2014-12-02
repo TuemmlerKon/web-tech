@@ -30,4 +30,8 @@ $(function() {
       });
       return false;
    });
+
+   $('.panel-heading').on('click', function() {
+      $(this).parent().find(".panel-body").fadeToggle();
+   });
 });

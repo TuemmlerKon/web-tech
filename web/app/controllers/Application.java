@@ -55,12 +55,10 @@ public class Application extends Controller {
         return ok(views.html.imprint.render(Messages.get("application.general.imprint")));
     }
 
-    @SecuredAction
     public static Result settings() {
         return ok(views.html.settings.render(Messages.get("application.general.settings")));
     }
 
-    @SecuredAction
     public static Result myfiles() {
         return ok(views.html.myfiles.render(Messages.get("application.general.myfiles")));
     }
