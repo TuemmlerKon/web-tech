@@ -15,6 +15,10 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "2.1.1",
   "org.webjars" % "bootstrap" % "3.1.1-2",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.1",
-  "ws.securesocial" %% "securesocial" % "master-SNAPSHOT")
+  "ws.securesocial" %% "securesocial" % "master-SNAPSHOT",
+  jdbc,
+  javaEbean,
+  cache,
+  "mysql" % "mysql-connector-java" % "5.1.27")
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)

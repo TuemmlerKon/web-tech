@@ -1,4 +1,4 @@
-@(message: String)
+@(message: String, news: List[News])
 
 @import play.i18n.Messages
 
@@ -73,10 +73,9 @@
             <h3 class="panel-title">Neuigkeiten</h3>
         </div>
         <div class="panel-body">
-            <p><strong>Montag, den 01. Januar 1970:</strong> Da ist was ganz neues Passiert</p>
-            <p><strong>Montag, den 02. Januar 1971:</strong> Da ist was ganz neues Passiert</p>
-            <p><strong>Montag, den 03. Januar 1972:</strong> Da ist was ganz neues Passiert</p>
-            <p><strong>Montag, den 04. Januar 1973:</strong> Da ist was ganz neues Passiert</p>
+            @for(entry <- news) {
+                <p><span class="text-muted">@entry.date.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</span>: <strong>@entry.name</strong> @entry.text</p>
+            }
         </div>
     </div>
 

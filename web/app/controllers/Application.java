@@ -1,13 +1,20 @@
 package controllers;
 
+import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import models.File;
+import models.News;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.i18n.Messages;
 import play.Logger;
 import scala.Array;
+import play.db.*;
+import java.sql.*;
+import java.util.List;
+
 import securesocial.core.BasicProfile;
 import securesocial.core.RuntimeEnvironment;
 import securesocial.core.java.SecureSocial;
@@ -28,8 +35,9 @@ public class Application extends Controller {
     }
 
     public static Result index() {
-        return ok(views.html.index.render(Messages.get("application.general.index")));
+        return ok(views.html.index.render(Messages.get("application.general.index"), News.find.all()));
     }
+
     public static Result test() {
 
         JsonNode json = request().body().asJson();
@@ -60,7 +68,7 @@ public class Application extends Controller {
     }
 
     public static Result myfiles() {
-        return ok(views.html.myfiles.render(Messages.get("application.general.myfiles")));
+        return ok(views.html.myfiles.render(Messages.get("application.general.myfiles"), File.find.all()));
     }
 
 }
