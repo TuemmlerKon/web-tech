@@ -287,7 +287,7 @@ public class Account extends Controller {
                 //Wenn ein Benutzer mit dem entsprechenden Passwort und E-Mail gefunden wurde
 
                 //zuerst Prüfen ob er aktiviert ist. Sonst brechen wir ebenfalls ab
-                if(rs.getString("activation").isEmpty()) {
+                if(!rs.getString("activation").isEmpty()) {
                     logger.debug("GetUser: User not activated");
                     return null;
                 }
