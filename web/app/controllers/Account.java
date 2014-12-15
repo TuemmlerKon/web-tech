@@ -276,13 +276,11 @@ public class Account extends Controller {
 
     private static User getUser(String email, String password) {
         PreparedStatement prep = null;
-        //Das Passwort hashen und salten
-        password = Codecs.sha1(password+SALT);
 
         try {
-            prep = connection.prepareStatement("SELECT * FROM "+TABLE+" WHERE `email` = ? AND `password` = ?;");
+            prep = connection.prepareStatement("SELECT * FROM "+TABLE+" WHERE `email` = ? AND `password` = SHA1(?);");
             prep.setString(1, email);
-            prep.setString(2, password);
+            prep.setString(2, password+SALT);
             prep.execute();
             ResultSet rs = prep.getResultSet();
             if (rs.next()) {
