@@ -1,33 +1,55 @@
 package models;
 
-import java.util.*;
-import javax.persistence.*;
+import play.data.validation.Constraints;
 
-import play.db.ebean.*;
-import play.data.format.*;
-import play.data.validation.*;
-
-@Entity
-public class User extends Model {
-
-    @Id
-    @Constraints.Min(10)
-    public Long id;
-
+public class User {
     @Constraints.Required
-    public String filename;
-
+    public String prename;
     @Constraints.Required
-    public long size;
-
+    public String surname;
     @Constraints.Required
-    public String service;
+    public String email;
+    @Constraints.Required
+    public String password;
+    public String password2;
 
-    @Formats.DateTime(pattern="dd/MM/yyyy")
-    public Date createDate = new Date();
+    public String getPrename() {
+        return prename;
+    }
 
-    public static Finder<Long,User> find = new Finder<Long,User>(
-            Long.class, User.class
-    );
+    public void setPrename(String prename) {
+        this.prename = prename;
+    }
 
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword2() {
+        return password2;
+    }
+
+    public void setPassword2(String password2) {
+        this.password2 = password2;
+    }
 }

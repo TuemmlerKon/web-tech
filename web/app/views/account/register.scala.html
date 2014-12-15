@@ -1,18 +1,18 @@
-@(message: String)
+@(message: String, RegisterForm: play.data.Form[User])
 
 @import play.i18n.Messages
 
 @nouser(message) {
     <div class="container">
-        <form class="form-signin" role="form">
+        @helper.form(action = routes.Account.registerPost(), 'class -> "form-signin") {
             <h2 class="form-signin-heading"><span class="glyphicon glyphicon-cloud"></span></h2>
             <h2 class="form-signin-heading">@Messages.get("user.register.title")</h2>
-            <input type="email" class="form-control" placeholder="@Messages.get("user.register.prename")" required autofocus>
-            <input type="email" class="form-control" placeholder="@Messages.get("user.register.surname")" required autofocus>
-            <input type="email" class="form-control" placeholder="@Messages.get("user.register.email")" required autofocus>
-            <input type="password" class="form-control" placeholder="@Messages.get("user.register.password")" required>
-            <input type="password" class="form-control" placeholder="@Messages.get("user.register.password2")" required>
+            <input name="prename" type="text" class="form-control" placeholder="@Messages.get("user.register.prename")" required autofocus>
+            <input name="surname" type="text" class="form-control" placeholder="@Messages.get("user.register.surname")" required autofocus>
+            <input name="email" type="email" class="form-control" placeholder="@Messages.get("user.register.email")" required autofocus>
+            <input name="password" type="password" class="form-control" placeholder="@Messages.get("user.register.password")" required>
+            <input name="password2" type="password" class="form-control" placeholder="@Messages.get("user.register.password2")" required>
             <button class="btn btn-lg btn-primary btn-block" type="submit">@Messages.get("user.register.register")</button>
-        </form>
+        }
     </div>
 }

@@ -15,24 +15,9 @@ import play.db.*;
 import java.sql.*;
 import java.util.List;
 
-import securesocial.core.BasicProfile;
-import securesocial.core.RuntimeEnvironment;
-import securesocial.core.java.SecureSocial;
-import securesocial.core.java.SecuredAction;
-import securesocial.core.java.UserAwareAction;
-
 public class Application extends Controller {
     public static Logger.ALogger logger = Logger.of("application.controllers.Application");
-    private RuntimeEnvironment env;
-    /**
-     * A constructor needed to get a hold of the environment instance.
-     * This could be injected using a DI framework instead too.
-     *
-     * @param env
-     */
-    public Application(RuntimeEnvironment env) {
-        this.env = env;
-    }
+
 
     public static Result index() {
         return ok(views.html.index.render(Messages.get("application.general.index"), News.find.all(), File.find.all()));
