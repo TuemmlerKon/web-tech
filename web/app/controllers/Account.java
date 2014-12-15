@@ -260,7 +260,10 @@ public class Account extends Controller {
         user.setEmail(session("email"));
         user.setPrename(session("prename"));
         user.setSurname(session("surname"));
-        user.setLastlogin(DateTime.parse(session("lastlogin")));
+
+        if(!session("lastlogin").isEmpty()) {
+            user.setLastlogin(DateTime.parse(session("lastlogin")));
+        }
 
         return user;
     }
@@ -297,7 +300,11 @@ public class Account extends Controller {
                 user.setPrename(rs.getString("prename"));
                 user.setSurname(rs.getString("surname"));
                 user.setCreatedate(DateTime.parse(rs.getTimestamp("createdate").toLocalDateTime().toString()));
-                user.setLastlogin(DateTime.parse(rs.getTimestamp("lastlogin").toLocalDateTime().toString()));
+
+                Timestamp timestamp = rs.getTimestamp("lastlogin");
+                if(timestamp != null) {
+                    user.setLastlogin(DateTime.parse(timestamp.toLocalDateTime().toString()));
+                }
 
                 //da sich der Benutzer ja erfolgreich angemeldet hat updaten wir jetzt noch den letzten Login in der Datenbank
                 prep.execute("UPDATE "+TABLE+" SET `lastlogin` = NOW() WHERE `email` = '"+user.getEmail()+"';");
