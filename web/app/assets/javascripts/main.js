@@ -31,6 +31,22 @@ $(function() {
       return false;
    });
 
+   $('.input-group.password .glyphicon-eye-open').on('click', function () {
+
+      var child = $(this).parent().find('input.form-control');
+
+      if(child.attr('type') == 'password') {
+         child.attr('type', 'text');
+         $(this).removeClass('glyphicon-eye-open');
+         $(this).addClass('glyphicon-eye-close');
+      } else {
+         child.attr('type', 'password');
+         $(this).removeClass('glyphicon-eye-close');
+         $(this).addClass('glyphicon-eye-open');
+      }
+   });
+
+
    $('.panel-heading').on('click', function() {
       $(this).parent().find(".panel-body").fadeToggle();
    });
