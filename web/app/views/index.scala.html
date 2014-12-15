@@ -11,7 +11,11 @@
             <h3 class="panel-title">Willkommen, @User.prename.toUpperCase()</h3>
         </div>
         <div class="panel-body">
-            <p>Dein letzter Login war am <strong>@User.lastlogin.toDateTimeISO.toString("dd.MM.YYYY")</strong> um <strong>@User.lastlogin.toDateTimeISO.toString("HH:MM") Uhr</strong></p>
+            @if(User.lastlogin == null) {
+                <p>Wir freuen uns dich auf unserem Portal begrüßen zu dürfen!</p>
+            } else {
+                <p>Dein letzter Login war am <strong>@User.lastlogin.toDateTimeISO.toString("dd.MM.YYYY")</strong> um <strong>@User.lastlogin.toDateTimeISO.toString("HH:MM") Uhr</strong></p>
+            }
         </div>
     </div>
 
