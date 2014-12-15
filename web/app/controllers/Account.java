@@ -2,6 +2,7 @@ package controllers;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import play.api.db.DB;
 import play.mvc.Controller;
 import play.mvc.Result;
 import java.math.BigInteger;
@@ -10,6 +11,12 @@ import play.i18n.Messages;
 import service.Mailer;
 
 public class Account extends Controller {
+
+    public DB db = null;
+
+    public Account() {
+        db = DB.getConnection(true);
+    }
 
     public static Result login() {
         return ok(views.html.account.login.render(Messages.get("application.general.login")));
@@ -46,6 +53,11 @@ public class Account extends Controller {
         return ok(views.html.account.activation.render(Messages.get("user.activation.successfull")));
     }
 
+    public boolean isLoggedIn() {
+        //ToDo: Hier muss noch die Logik hin
+        return true;
+    }
+
     private final class generateCode {
 
         private SecureRandom random = new SecureRandom();
@@ -54,5 +66,4 @@ public class Account extends Controller {
             return new BigInteger(130, random).toString(32);
         }
     }
-
 }
