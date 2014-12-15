@@ -7,6 +7,7 @@ import models.*;
 import org.joda.time.DateTime;
 import play.Logger;
 import play.api.libs.Codecs;
+import play.data.DynamicForm;
 import play.db.*;
 import play.data.Form;
 import play.mvc.Controller;
@@ -72,6 +73,54 @@ public class Account extends Controller {
         flash("success", Messages.get("user.login.successful"));
         logger.debug("Login: User "+user.getEmail()+" successful logged in");
         return redirect(controllers.routes.Application.index());
+    }
+
+    public static Result changePassword() {
+        DynamicForm requestData = Form.form().bindFromRequest();
+
+        if(requestData == null || requestData.hasErrors()) {
+            flash("error", Messages.get("user.settings.unknownerror"));
+            logger.debug("Change password: Unknown error while changeing the password");
+            return redirect(controllers.routes.Application.settings());
+        }
+        //Daten lesen
+        String oldpassword = requestData.get("oldpassword");
+        String password = requestData.get("password");
+        String password2 = requestData.get("password2");
+
+        User user = getUser(session("email"), oldpassword);
+
+        if (user == null) {
+            //wenn kein User gefunden wurde war das alte Passwort falsch
+            flash("error", Messages.get("user.settings.invalidpassword"));
+            logger.debug("Change password: Invalid password");
+            return redirect(controllers.routes.Application.settings());
+        }
+        //überprüfen ob die beiden Passwörter gleich sind
+        if (!password.equals(password2)) {
+            //wenn kein User gefunden wurde war das alte Passwort falsch
+            flash("error", Messages.get("user.settings.newpasswordsdontmatch"));
+            logger.debug("Change password: Passwords dont match");
+            return redirect(controllers.routes.Application.settings());
+        }
+        //wenn hier angekommen dann passt alles also passwort update
+        PreparedStatement stmt = null;
+        try {
+            stmt = connection.prepareStatement("UPDATE " + TABLE + " SET `password` = SHA1(?) WHERE `email` = ?;");
+            stmt.setString(2, user.getEmail());
+            stmt.setString(1, password+SALT);
+            stmt.execute();
+            stmt.close();
+            //Nachricht ausgeben, dass die Registrierung erfolgreich war und dann ab gehts zur Bestätigunsseite
+            flash("success", Messages.get("user.changepassword.succesful"));
+            logger.debug("Change password: Successful changed password for user: "+user.getEmail());
+            return redirect(controllers.routes.Account.logout());
+        }
+        catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+
+        return redirect(controllers.routes.Application.settings());
     }
 
     public static Result logout() {
