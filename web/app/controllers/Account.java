@@ -3,8 +3,10 @@ package controllers;
 import java.sql.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import models.User;
+import models.*;
+import org.joda.time.DateTime;
 import play.Logger;
+import play.api.libs.Codecs;
 import play.db.*;
 import play.data.Form;
 import play.mvc.Controller;
@@ -13,6 +15,8 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.*;
+import java.util.Date;
 
 import play.i18n.Messages;
 import service.Mailer;
@@ -28,14 +32,58 @@ public class Account extends Controller {
 
     public static Result login() {
 
+        String email = session("email");
+
+        if(email != null && !email.isEmpty()) {
+            logger.debug("User is already logged in. Redirect to main page");
+            return redirect(controllers.routes.Application.index());
+        }
+
         createTableIfNotExist();
 
-        return ok(views.html.account.login.render(Messages.get("application.general.login")));
+        return ok(views.html.account.login.render(Messages.get("application.general.login"), Form.form(Login.class)));
+    }
+
+    public static Result loginPost() {
+        Form<Login> userForm = Form.form(Login.class);
+        Login login = userForm.bindFromRequest().get();
+
+        if (login == null || userForm.hasErrors()) {
+            //Wenn es schon beim Formular ein Problem gab, gehen wir ebenfalls gleich wieder zum Login
+            flash("error", Messages.get("user.login.invalidcredentials"));
+            logger.debug("Login: Form submission error");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        User user = getUser(login.getEmail(), login.getPassword());
+
+        if (user == null) {
+            //Wenn es aus der Datenbank keine Daten gab, dann gehen wir wieder zur Loginseite
+            flash("error", Messages.get("user.login.invalidcredentials"));
+            logger.debug("Login: Could not find user in database");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        session("email", user.getEmail());
+        session("prename", user.getPrename());
+        session("surname", user.getSurname());
+        session("lastlogin", user.getLastlogin() == null ? "" : user.getLastlogin().toLocalDateTime().toString());
+        //Nachricht dass alles gepasst hat
+        flash("success", Messages.get("user.login.successful"));
+        logger.debug("Login: User "+user.getEmail()+" successful logged in");
+        return redirect(controllers.routes.Application.index());
     }
 
     public static Result logout() {
 
-        return ok(views.html.account.login.render(Messages.get("application.general.logout")));
+        session("email", "");
+        session("prename", "");
+        session("surname", "");
+        session("lastlogin", "");
+
+        flash("success", Messages.get("user.logout.successful"));
+        logger.debug("Logout: User successful logged out");
+        return redirect(controllers.routes.Account.login());
     }
 
     public static Result register() {
@@ -148,9 +196,6 @@ public class Account extends Controller {
         catch (SQLException e) {
             logger.error(e.getMessage());
         }
-
-
-
         //wenn alles schief ging und wir auch keine entsprechende Meldung machen konnten, geben wir einfach nen Fehler aus und gehen zurück zur Registrierung
         //Dieser Fall sollte aber eigentlich nie eintreten
         flash("error", Messages.get("user.activate.unknownerror"));
@@ -158,10 +203,17 @@ public class Account extends Controller {
         return redirect(controllers.routes.Account.register());
     }
 
-    public static boolean isLoggedIn() {
+    public static User getCurrentUser() {
         String result = session("email");
-        if(result == null || result.equals("")) return false;
-        return true;
+        if(result == null || result.equals("")) return null;
+
+        User user = new User();
+        user.setEmail(session("email"));
+        user.setPrename(session("prename"));
+        user.setSurname(session("surname"));
+        user.setLastlogin(DateTime.parse(session("lastlogin")));
+
+        return user;
     }
 
     private final class generateCode {
@@ -171,6 +223,49 @@ public class Account extends Controller {
         public String generate() {
             return new BigInteger(130, random).toString(32);
         }
+    }
+
+    private static User getUser(String email, String password) {
+        PreparedStatement prep = null;
+        //Das Passwort hashen und salten
+        password = Codecs.sha1(password+SALT);
+
+        try {
+            prep = connection.prepareStatement("SELECT * FROM "+TABLE+" WHERE `email` = ? AND `password` = ?;");
+            prep.setString(1, email);
+            prep.setString(2, password);
+            prep.execute();
+            ResultSet rs = prep.getResultSet();
+            if (rs.next()) {
+                //Wenn ein Benutzer mit dem entsprechenden Passwort und E-Mail gefunden wurde
+
+                //zuerst Prüfen ob er aktiviert ist. Sonst brechen wir ebenfalls ab
+                if(rs.getString("activation").isEmpty()) {
+                    logger.debug("GetUser: User not activated");
+                    return null;
+                }
+
+                User user = new User();
+                user.setEmail(rs.getString("email"));
+                user.setPrename(rs.getString("prename"));
+                user.setSurname(rs.getString("surname"));
+                user.setCreatedate(DateTime.parse(rs.getTimestamp("createdate").toLocalDateTime().toString()));
+                user.setLastlogin(DateTime.parse(rs.getTimestamp("lastlogin").toLocalDateTime().toString()));
+
+                //da sich der Benutzer ja erfolgreich angemeldet hat updaten wir jetzt noch den letzten Login in der Datenbank
+                prep.execute("UPDATE "+TABLE+" SET `lastlogin` = NOW() WHERE `email` = '"+user.getEmail()+"';");
+                prep.close();
+                return user;
+            } else {
+                //wenn es einen Fehler bei der Autorisierung gab
+                return null;
+            }
+        }
+        catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+
+        return null;
     }
 
     /**
@@ -190,8 +285,8 @@ public class Account extends Controller {
                         "  `email` varchar(255) NOT NULL," +
                         "  `password` varchar(255) NOT NULL," +
                         "  `activation` varchar(255) NOT NULL," +
-                        "  `createdate` date NOT NULL," +
-                        "  `lastlogin` date" +
+                        "  `createdate` datetime NOT NULL," +
+                        "  `lastlogin` datetime" +
                         ") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
                 stmt.close();
                 logger.info("Created new table " + TABLE + " in database!");

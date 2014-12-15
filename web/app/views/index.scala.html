@@ -1,19 +1,17 @@
-@(message: String, news: List[News], files: List[File])
+@(message: String, User: models.User, news: List[News], files: List[File])
 
 @import play.i18n.Messages
 
 @percent = {80}
-@lastloginday = {Montag, den 01. Januar 1970}
-@lastlogintime = {14:30}
 
 @main(message) {
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Willkommen, BENUTZERNAME</h3>
+            <h3 class="panel-title">Willkommen, @User.prename.toUpperCase()</h3>
         </div>
         <div class="panel-body">
-            <p>Dein letzter Login war am <strong>@{lastloginday}</strong> um <strong>@{lastlogintime} Uhr</strong></p>
+            <p>Dein letzter Login war am <strong>@User.lastlogin.toDateTimeISO.toString("dd.MM.YYYY")</strong> um <strong>@User.lastlogin.toDateTimeISO.toString("HH:MM") Uhr</strong></p>
         </div>
     </div>
 

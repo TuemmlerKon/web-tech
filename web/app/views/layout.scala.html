@@ -1,9 +1,11 @@
 @(title: String)(content: Html)
 
+@import play.i18n.Messages
+
 <!DOCTYPE html>
 <html>
     <head>
-        <title>@title | web-tech</title>
+        <title>@title | @Messages.get("application.general.title")</title>
         <meta charset="UTF-8">
         <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")'>
         <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>

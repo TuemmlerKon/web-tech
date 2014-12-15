@@ -1,5 +1,7 @@
 @(title: String)(content: Html)
 
+@import play.i18n.Messages
+
 @layout(title) {
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
@@ -13,21 +15,30 @@
                 <a class="navbar-brand" href="@routes.Application.index()">CloudPlex Project</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="@routes.Application.index()">Dashboard</a></li>
-                    <li><a href="@routes.Application.myfiles()">Meine Dateien</a></li>
-                    <li><a href="@routes.Application.settings()">Einstellungen</a></li>
-                </ul>
+                @if(Account.getCurrentUser != null) {
+                    <ul class="nav navbar-nav">
+                        <li class=""><a href="@routes.Application.index()">@Messages.get("application.general.dashboard")</a></li>
+                        <li><a href="@routes.Application.myfiles()">@Messages.get("application.general.myfiles")</a></li>
+                        <li><a href="@routes.Application.settings()">@Messages.get("application.general.settings")</a></li>
+                    </ul>
+                } else {
+                    <ul class="nav navbar-nav">
+                        <li><a href="@routes.Account.login()">@Messages.get("application.general.login")</a></li>
+                        <li><a href="@routes.Account.register()">@Messages.get("user.activation.register")</a></li>
+                    </ul>
+                }
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="@routes.Application.gtc()">AGB</a></li>
-                    <li><a href="@routes.Application.imprint()">Impressum</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">BENUTZERNAME <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="@routes.Application.settings()">Einstellungen</a></li>
-                            <li><a href="@routes.Account.logout()">abmelden</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="@routes.Application.gtc()">@Messages.get("application.general.gtc.short")</a></li>
+                    <li><a href="@routes.Application.imprint()">@Messages.get("application.general.imprint")</a></li>
+                    @if(Account.getCurrentUser != null) {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">@Account.getCurrentUser.prename.toUpperCase()<span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="@routes.Application.settings()">@Messages.get("application.general.settings")</a></li>
+                                <li><a href="@routes.Account.logout()">@Messages.get("application.general.logout")</a></li>
+                            </ul>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

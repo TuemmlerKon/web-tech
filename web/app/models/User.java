@@ -1,6 +1,8 @@
 package models;
 
+import org.joda.time.DateTime;
 import play.data.validation.Constraints;
+
 
 public class User {
     @Constraints.Required
@@ -9,9 +11,27 @@ public class User {
     public String surname;
     @Constraints.Required
     public String email;
+    public DateTime createdate;
+    public DateTime lastlogin;
     @Constraints.Required
     public String password;
     public String password2;
+
+    public DateTime getCreatedate() {
+        return createdate;
+    }
+
+    public void setCreatedate(DateTime createdate) {
+        this.createdate = createdate;
+    }
+
+    public DateTime getLastlogin() {
+        return lastlogin;
+    }
+
+    public void setLastlogin(DateTime lastlogin) {
+        this.lastlogin = lastlogin;
+    }
 
     public String getPrename() {
         return prename;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.File;
 import models.News;
+import models.User;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -20,7 +21,15 @@ public class Application extends Controller {
 
 
     public static Result index() {
-        return ok(views.html.index.render(Messages.get("application.general.index"), News.find.all(), File.find.all()));
+
+        if(Account.getCurrentUser() == null) {
+            logger.debug("Index: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+
+
+        User user = Account.getCurrentUser();
+        return ok(views.html.index.render(Messages.get("application.general.index"), user, News.find.all(), File.find.all()));
     }
 
     public static Result test() {
