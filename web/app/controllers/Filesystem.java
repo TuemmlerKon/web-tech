@@ -106,13 +106,16 @@ public class Filesystem extends Controller {
         }
         //wenn hier angelangt, können wir die Datei herunterladen
         String sub = "";
-        if (file.getParent() != null) {
-            sub = file.getParent()+"/";
+        File f = file.getParent();
+        if (f != null) {
+            sub = f.id.toString()+"/";
         }
+
+        logger.debug("sub: "+file.getParent());
 
         response().setContentType("application/x-download");
         response().setHeader("Content-disposition","attachment; filename=\""+file.getFilename()+"\"");
-        return ok(new java.io.File(ROOT_FOLDER, user.getId()+"/"+sub+file.getFilename()));
+        return ok(new java.io.File(ROOT_FOLDER, user.getId() + "/" + sub + file.getFilename()));
     }
 
     public static File getCWD() {
@@ -282,7 +285,7 @@ public class Filesystem extends Controller {
             logger.debug("Filesystem: Successfull created folder "+foldername+" for user "+user.getEmail());
         } else {
             flash("error", Messages.get("filesystem.folder.creationerror", foldername));
-            logger.debug("Filesystem: Error while creating "+foldername+" for user "+user.getEmail()+". Folder exists");
+            logger.debug("Filesystem: Error while creating " + foldername + " for user " + user.getEmail() + ". Folder exists");
         }
 
         return redirect(controllers.routes.Filesystem.index());
