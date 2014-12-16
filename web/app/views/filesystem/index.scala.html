@@ -8,7 +8,7 @@
     @if(withdelete) {
         <button type="button" class="btn btn-danger btn-sm pull-right filesystem-action" id="deleteselected" data-url=""><span class="fa fa-remove"></span> @Messages.get("user.files.options.deleteselected")</button>
     }
-    <button type="button" class="btn btn-success btn-sm pull-right filesystem-action" id="uploadfile" data-url=""><span class="fa fa-file"></span> @Messages.get("user.files.options.uploadfile")</button>
+    <button type="button" class="btn btn-success btn-sm pull-right filesystem-action modal-action" id="uploadfile" data-requesturl="@controllers.routes.Modal.newFile()"><span class="fa fa-file"></span> @Messages.get("user.files.options.uploadfile")</button>
     <button type="button" class="btn btn-info btn-sm pull-right filesystem-action modal-action" data-requesturl="@controllers.routes.Modal.newFolder()" id="newfolder" data-url=""><span class="fa fa-folder"></span> @Messages.get("user.files.options.newfolder")</button>
 }
 
@@ -54,7 +54,7 @@
                         <td>@file.createDate.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</td>
                         <td>
                             @if(file.filetype == "file") {
-                                @(file.size / 1024) KBytes
+                                @(file.size) Bytes
                             } else {
                                 @Messages.get("user.files.isfolder")
                             }

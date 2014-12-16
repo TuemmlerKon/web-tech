@@ -12,6 +12,7 @@ user.login.email=Deine E-Mailadresse
 user.login.password=Dein Passwort
 user.login.signin=anmelden
 user.login.notregistered=Noch nicht registriert?
+application.general.upload=hochladen
 application.general.abort=abbrechen
 application.general.close=schließen
 application.general.create=erstellen

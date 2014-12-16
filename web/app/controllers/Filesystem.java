@@ -1,19 +1,15 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.File;
 import models.User;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.i18n.Messages;
-import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
-import com.fasterxml.jackson.databind.JsonNode;
-import play.mvc.BodyParser;
-
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +17,8 @@ public class Filesystem extends Controller {
 
     public static final String FILETYPE_FILE = "file";
     public static final String FILETYPE_FOLDER = "folder";
+
+    public static final String ROOT_FOLDER = "./storage";
 
     public static Logger.ALogger logger = Logger.of("application.controllers.Filesystem");
 
@@ -134,6 +132,64 @@ public class Filesystem extends Controller {
         return file;
     }
 
+    public static Result newFile() {
+        //Pürfen ob der User überhaupt das Recht hat hier was zu machen
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
+            logger.debug("Filesystem: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+        //Wir prüfen mal ob der betreffende Benutzer überhaupt schon einen eigenen Ordner hat
+        checkUserFolder(user);
+
+        //jetzt holen wir uns noch die ordnerid
+        String folderid = "";
+        File cwd = getCWD();
+        if (cwd != null) {
+            //wenn die Datei nicht im Root-Verzeichnis abgelegt werden soll,
+            //dann hängen wir einfach die ID des Ordners und ein / an den Pfad
+            folderid = cwd.id.toString()+"/";
+        }
+
+        //laden der Datei vom hochladen
+        Http.MultipartFormData body = request().body().asMultipartFormData();
+        Http.MultipartFormData.FilePart data = body.getFile("filename");
+        if (data != null) {
+            String fileName = data.getFilename();
+            String contentType = data.getContentType();
+            java.io.File file = data.getFile();
+            java.io.File test = new java.io.File(ROOT_FOLDER, user.getId().toString()+"/"+folderid+fileName);
+
+            if(test.exists()) {
+                logger.debug("Filesystem: File already exists "+test.getPath());
+                flash("error", "File already exists");
+                return redirect(controllers.routes.Filesystem.index());
+            }
+
+            if(file.renameTo(test)) {
+                //Daten in die Datenbank schreiben
+                File f_obj = new File();
+                f_obj.setFilename(fileName);
+                f_obj.setFiletype(FILETYPE_FILE);
+                f_obj.setCreateDate(new Date());
+                f_obj.setSize(test.length());
+                f_obj.setService("lokal");
+                f_obj.setOwner(user.getId());
+                f_obj.setParent(getCWD());
+                Ebean.save(f_obj);
+
+                logger.debug("Filesystem: Successful fileupload of "+fileName+" for user "+user.getEmail());
+                flash("success", "File uploaded");
+            }
+        } else {
+            logger.debug("Filesystem: Error while uploading file for user "+user.getEmail());
+            flash("error", "Missing file");
+        }
+
+        return redirect(controllers.routes.Filesystem.index());
+    }
+
     public static Result newFolder() {
 
         User user = Account.getCurrentUser();
@@ -142,6 +198,8 @@ public class Filesystem extends Controller {
             logger.debug("Filesystem: User unauthenticated");
             return redirect(controllers.routes.Account.login());
         }
+        //falls zuerst ein Ordner angelegt wird, müssen wir auch hier schauen, dass das Heimverzeichnis des Benutzers existiert
+        checkUserFolder(user);
 
         DynamicForm requestData = Form.form().bindFromRequest();
         String foldername = requestData.get("foldername");
@@ -171,6 +229,15 @@ public class Filesystem extends Controller {
             folder.setOwner(user.getId());
             folder.setParent(getCWD());
             Ebean.save(folder);
+            Ebean.refresh(folder);
+            //wenn wir einen neuen Ordner anlegen, dann müssen wir auch im selben Zug den Ordner auf dem Dateisystem anlegen
+            java.io.File newfolder = new java.io.File(ROOT_FOLDER, user.getId()+"/"+folder.id);
+            if(newfolder.mkdir()) {
+                logger.debug("Filesystem: Successfull created folder "+newfolder.getPath()+" for user "+user.getEmail());
+            } else {
+                logger.debug("Filesystem: Error while creating folder "+newfolder.getPath()+" for user "+user.getEmail());
+            }
+
             flash("success", Messages.get("filesystem.folder.creationsuccess", foldername));
             logger.debug("Filesystem: Successfull created folder "+foldername+" for user "+user.getEmail());
         } else {
@@ -180,4 +247,27 @@ public class Filesystem extends Controller {
 
         return redirect(controllers.routes.Filesystem.index());
     }
+
+    private static void checkUserFolder(User user) {
+        java.io.File root = new java.io.File(ROOT_FOLDER);
+        //zuerst initialisieren wir mit dem Root direktory falls das noch nicht existiert
+        if (!root.exists()) {
+            if(root.mkdir()) {
+                logger.debug("Filesystem: Created root directory");
+            } else {
+                logger.debug("Filesystem: Error while creating root directory");
+            }
+        }
+        logger.debug(root.getAbsolutePath());
+        //jetzt schauen wir ob der betreffende Benutzer überhaupt schon ein eigenes Verzeichnis hat
+        java.io.File userfolder = new java.io.File(root, user.getId().toString());
+        if (!userfolder.exists()) {
+            if(userfolder.mkdir()) {
+                logger.debug("Filesystem: Created user directory for "+user.getEmail());
+            } else {
+                logger.debug("Filesystem: Error while creating user directory for "+user.getEmail());
+            }
+        }
+    }
+
 }

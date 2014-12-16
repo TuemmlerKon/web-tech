@@ -18,7 +18,9 @@ GET         /meine-dateien           controllers.Filesystem.index()
 GET         /cwd/:folder             controllers.Filesystem.cwd(folder: Long)
 GET         /download/:file          controllers.Filesystem.download(file: Long)
 POST        /neuerordner             controllers.Filesystem.newFolder()
+POST        /neuedatei               controllers.Filesystem.newFile()
 GET         /modal/neuerordner       controllers.Modal.newFolder()
+GET         /modal/neuedatei         controllers.Modal.newFile()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file            controllers.Assets.at(path="/public", file)

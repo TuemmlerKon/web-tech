@@ -18,4 +18,10 @@ public class Modal extends Controller {
         return ok(result);
     }
 
+    public static Result newFile() {
+        ObjectNode result = Json.newObject();
+        result.put("body", views.html.modal.newfile.render().toString());
+        return ok(result);
+    }
+
 }
