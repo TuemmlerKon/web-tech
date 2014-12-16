@@ -1,12 +1,20 @@
 package controllers;
 
+import com.avaje.ebean.Ebean;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.File;
 import models.User;
 import play.Logger;
+import play.data.DynamicForm;
+import play.data.Form;
 import play.i18n.Messages;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import com.fasterxml.jackson.databind.JsonNode;
+import play.mvc.BodyParser;
 
+import java.util.Date;
 import java.util.List;
 
 public class Filesystem extends Controller {
@@ -36,6 +44,14 @@ public class Filesystem extends Controller {
     }
 
     public static Result cwd(Long folder) {
+
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
+            logger.debug("Filesystem: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+
         String cwd = "0";
 
         //Spezialfall: Wenn der Ordner 0 angefordert wird, wechseln wir direkt wieder ins ROOT-Verzeichnis
@@ -118,4 +134,50 @@ public class Filesystem extends Controller {
         return file;
     }
 
+    public static Result newFolder() {
+
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
+            logger.debug("Filesystem: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        DynamicForm requestData = Form.form().bindFromRequest();
+        String foldername = requestData.get("foldername");
+        //zuerst müssen wir schauen ob überhaupt etwas übertragen wurde
+        if (foldername == null) {
+            flash("error", Messages.get("filesystem.folder.error"));
+            logger.debug("Filesystem: User submitted empty folder name or an error occured");
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        File dir = getCWD();
+        String cwd = null;
+        if (dir != null) {
+            cwd = dir.id.toString();
+        }
+
+        //jetzt müssen wir schauen, ob es evtl. schon einen Ordner mit diesem Namen gibt
+        List<File> folders = File.find.where().eq("owner", user.getId()).eq("filetype", FILETYPE_FOLDER).eq("filename", foldername).eq("parent_index", cwd).findList();
+        //wenn in der Liste keine Objekte liegen, dann können wir den Ordner anlegen
+        if (folders.isEmpty()) {
+            File folder = new File();
+            folder.setFilename(foldername);
+            folder.setFiletype(FILETYPE_FOLDER);
+            folder.setCreateDate(new Date());
+            folder.setSize(0);
+            folder.setService("lokal");
+            folder.setOwner(user.getId());
+            folder.setParent(getCWD());
+            Ebean.save(folder);
+            flash("success", Messages.get("filesystem.folder.creationsuccess", foldername));
+            logger.debug("Filesystem: Successfull created folder "+foldername+" for user "+user.getEmail());
+        } else {
+            flash("error", Messages.get("filesystem.folder.creationerror", foldername));
+            logger.debug("Filesystem: Error while creating "+foldername+" for user "+user.getEmail()+". Folder exists");
+        }
+
+        return redirect(controllers.routes.Filesystem.index());
+    }
 }

@@ -7,28 +7,18 @@ $(function() {
       });
    });
 
-   $('#deleteselected').on('click', function() {
-      var values = new Array();
-      $('input[type=checkbox].multi-checkbox:not(.master):checked').each(function() {
-         values.push($(this).attr('data-value'));
-      });
+   $('.modal-action').on('click', function() {
       $.ajax({
-         type : 'POST',
-         url : $(this).attr("data-url"),
-         data : JSON.stringify(values),
-         contentType: "application/json; charset=utf-8",
-         dataType: "json",
+         type : 'GET',
+         url : $(this).attr('data-requesturl'),
          success : function(data) {
-            //setError('Call succedded');
-            //$('#test1').attr("src", data)
-            alert("ok")
+            $(".modal-content").html(data['body']);
          },
          error : function(data) {
-            //setError('Make call failed');
-            alert("error")
+            alert("failed");
          }
       });
-      return false;
+      $('#myModal').modal();
    });
 
    $('.input-group.password .glyphicon-eye-open').on('click', function () {
