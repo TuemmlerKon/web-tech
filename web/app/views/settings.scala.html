@@ -38,7 +38,7 @@
                 dann solltest du deine Dateien vorher senden (denke aber an die Verschlüsselung).</p>
             <p>Bei Fragen sende einfach eine E-Mail an <a href="#">hilfe@@projekt-web-tech.de</a></p>
             <form class="form-deleteaccount" role="form">
-                <button class="btn btn-sm btn-danger btn-block" type="submit"><span class="fa fa-remove"></span> @Messages.get("user.settings.deleteaccount")</button>
+                <button class="btn btn-sm btn-danger btn-block modal-action" data-requesturl="@controllers.routes.Modal.rmAccount()" type="button"><span class="fa fa-remove"></span> @Messages.get("user.settings.deleteaccount")</button>
             </form>
         </div>
     </div>

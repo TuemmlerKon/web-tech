@@ -24,4 +24,10 @@ public class Modal extends Controller {
         return ok(result);
     }
 
+    public static Result rmAccount() {
+        ObjectNode result = Json.newObject();
+        result.put("body", views.html.modal.rmaccount.render().toString());
+        return ok(result);
+    }
+
 }

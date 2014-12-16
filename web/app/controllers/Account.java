@@ -144,6 +144,51 @@ public class Account extends Controller {
         return ok(views.html.account.register.render(Messages.get("user.register.head.title"), Form.form(User.class)));
     }
 
+    public static Result rm() {
+
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
+            logger.debug("Filesystem: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        DynamicForm requestData = Form.form().bindFromRequest();
+        String rm = requestData.get("rmaccount");
+
+        if(rm != null && !rm.isEmpty() && rm.equals("yes")) {
+            //hier führen wir den Code nur aus, wenn es wirklich gewollt ist
+            if(Filesystem.rmUserFolder(user)) {
+                //wenn die Dateien erfolgreich gelöscht wurden, können wir jetzt den Benutzer aus dem System löschen und ihn abmelden
+                try {
+                    Statement stmt = connection.createStatement();
+                    stmt.execute("DELETE FROM "+TABLE+" WHERE `ID` = "+user.getId()+";");
+                    stmt.close();
+                    //Wenn das löschen des Users aus der Datenbank erfolgreich war
+                    flash("success", Messages.get("account.rmaccount.success"));
+                    logger.error("Account: Useraccount successful deleted for user "+user.getEmail());
+                    //nach dem löschen des Users aus der Datenbank melden wir ihn gleich ab
+                    return redirect(controllers.routes.Account.logout());
+                }
+                catch (SQLException e) {
+                    //Wenn das löschen des Users aus der Datenbank einen Fehler geworfen hat
+                    flash("error", Messages.get("account.rmaccount.error"));
+                    logger.error(e.getMessage());
+                }
+            } else {
+                //Wenn das löschen der Dateien einen Fehler verursacht hat
+                flash("error", Messages.get("account.rmaccount.error"));
+                logger.debug("Account: Could not delete user files");
+            }
+        } else {
+            //Wenn die Daten, welche vom User abgeschickt wurden fehlerhaft waren
+            flash("error", Messages.get("account.rmaccount.error"));
+            logger.debug("Account: Invalid data from user");
+        }
+
+        return redirect(controllers.routes.Application.settings());
+    }
+
     public static Result registerPost() {
         Form<User> userForm = Form.form(User.class);
         User user = userForm.bindFromRequest().get();

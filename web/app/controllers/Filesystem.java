@@ -3,6 +3,7 @@ package controllers;
 import com.avaje.ebean.Ebean;
 import models.File;
 import models.User;
+import org.h2.store.fs.FileUtils;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -296,6 +297,21 @@ public class Filesystem extends Controller {
                 logger.debug("Filesystem: Error while creating user directory for "+user.getEmail());
             }
         }
+    }
+
+    public static boolean rmUserFolder(User user) {
+        java.io.File file = new java.io.File(ROOT_FOLDER, user.getId().toString());
+        //Dateien aus der Datenbank entfernen
+        Ebean.delete(File.find.where().eq("owner", user.getId()).findList());
+        //Die Dateien löschen wir hier aus dem Dateisystem
+        if(file.exists() && file.isDirectory()) {
+            FileUtils.deleteRecursive(ROOT_FOLDER+"/"+user.getId().toString(), true);
+            return true;
+        }
+        //hier nochmal schauen ob der Ordner weg ist. Wenn ja wars erfolgreich sonst false
+        if(!file.exists()) return true;
+
+        return false;
     }
 
 }
