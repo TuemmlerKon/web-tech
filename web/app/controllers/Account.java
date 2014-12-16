@@ -71,7 +71,7 @@ public class Account extends Controller {
         session("surname", user.getSurname());
         session("lastlogin", user.getLastlogin() == null ? "" : user.getLastlogin().toLocalDateTime().toString());
         //Nachricht dass alles gepasst hat
-        flash("success", Messages.get("user.login.successful"));
+        flash("success", Messages.get("user.login.successful", user.getPrename()));
         logger.debug("Login: User "+user.getEmail()+" successful logged in");
         return redirect(controllers.routes.Application.index());
     }
@@ -115,7 +115,7 @@ public class Account extends Controller {
             //Nachricht ausgeben, dass die Registrierung erfolgreich war und dann ab gehts zur Bestätigunsseite
             flash("success", Messages.get("user.changepassword.succesful"));
             logger.debug("Change password: Successful changed password for user: "+user.getEmail());
-            return redirect(controllers.routes.Account.logout());
+            return redirect(controllers.routes.Application.settings());
         }
         catch (SQLException e) {
             logger.error(e.getMessage());
@@ -126,13 +126,15 @@ public class Account extends Controller {
 
     public static Result logout() {
 
+        String user = session("prename");
+
         session("email", "");
         session("prename", "");
         session("surname", "");
         session("lastlogin", "");
         session("userid", "");
 
-        flash("success", Messages.get("user.logout.successful"));
+        flash("success", Messages.get("user.logout.successful", user));
         logger.debug("Logout: User successful logged out");
         return redirect(controllers.routes.Account.login());
     }
@@ -278,7 +280,7 @@ public class Account extends Controller {
                     logger.debug("Mailer currently disabled: Could not send activation verification");
                 }
                 //Nachrichtausgeben, dass die Aktivierung erfolgreich war und leiten zum Login weiter
-                flash("error", Messages.get("user.activate.successful"));
+                flash("success", Messages.get("user.activate.successful"));
                 logger.debug("User activated successful with key "+key);
                 return redirect(controllers.routes.Account.login());
             } else {

@@ -14,7 +14,6 @@ public class Application extends Controller {
 
 
     public static Result index() {
-
         if(Account.getCurrentUser() == null) {
             logger.debug("Index: User unauthenticated");
             return redirect(controllers.routes.Account.login());

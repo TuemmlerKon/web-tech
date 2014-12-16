@@ -2,6 +2,9 @@
 
 @import play.i18n.Messages
 
+    @msg_success = @{flash.get("success")}
+    @msg_error = @{flash.get("error")}
+
 @layout(title) {
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
@@ -45,7 +48,13 @@
     </nav>
     <div class="container">
         <div id="content" class="well well-sm">
-        @content
+            @if(msg_success != null && !msg_success.toString.isEmpty) {
+                <div class="alert small alert-success" role="alert"><strong><i class="fa fa-info"></i> <!--Messages.get("application.general.information")--></strong> @msg_success</div>
+            }
+            @if(msg_error != null && !msg_error.toString.isEmpty) {
+                <div class="alert small alert-danger" role="alert"><strong><i class="fa fa-exclamation-triangle"></i> <!--Messages.get("application.general.error")--></strong> @msg_error</div>
+            }
+            @content
         </div>
     </div>
     <div class="footer">
