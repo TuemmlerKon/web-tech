@@ -71,8 +71,36 @@ public class Filesystem extends Controller {
         return redirect(controllers.routes.Filesystem.index());
     }
 
-    public static Result download(Long file) {
-        return redirect(controllers.routes.Filesystem.index());
+    public static Result download(Long id) {
+
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
+            logger.debug("Filesystem: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+        //mal schauen ob es die Datei überhaupt gibt
+        File file = getFile(id);
+        if(file == null) {
+            flash("error", Messages.get("filesystem.file.notfound"));
+            logger.debug("Filesystem: Downloadfile not found");
+            return redirect(controllers.routes.Filesystem.index());
+        }
+        //wenn die Datei existiert, müssen wir noch schauen ob das auch unsere ist
+        if (!file.owner.equals(user.getId())) {
+            flash("error", Messages.get("filesystem.file.notownedbyyou"));
+            logger.debug("Filesystem: Downloadfile not owned by user"+user.getEmail());
+            return redirect(controllers.routes.Filesystem.index());
+        }
+        //wenn hier angelangt, können wir die Datei herunterladen
+        String sub = "";
+        if (file.getParent() != null) {
+            sub = file.getParent()+"/";
+        }
+
+        response().setContentType("application/x-download");
+        response().setHeader("Content-disposition","attachment; filename=\""+file.getFilename()+"\"");
+        return ok(new java.io.File(ROOT_FOLDER, user.getId()+"/"+sub+file.getFilename()));
     }
 
     public static File getCWD() {
