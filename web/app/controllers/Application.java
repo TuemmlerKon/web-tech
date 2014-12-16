@@ -1,20 +1,13 @@
 package controllers;
 
-import com.avaje.ebean.Ebean;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.File;
 import models.News;
 import models.User;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.i18n.Messages;
 import play.Logger;
-import scala.Array;
-import play.db.*;
-import java.sql.*;
-import java.util.List;
+
 
 public class Application extends Controller {
     public static Logger.ALogger logger = Logger.of("application.controllers.Application");
@@ -43,9 +36,4 @@ public class Application extends Controller {
     public static Result settings() {
         return ok(views.html.settings.render(Messages.get("application.general.settings")));
     }
-
-    public static Result myfiles() {
-        return ok(views.html.myfiles.render(Messages.get("application.general.myfiles"), File.find.all()));
-    }
-
 }

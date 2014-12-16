@@ -18,7 +18,7 @@
                 @if(Account.getCurrentUser != null) {
                     <ul class="nav navbar-nav">
                         <li class=""><a href="@routes.Application.index()">@Messages.get("application.general.dashboard")</a></li>
-                        <li><a href="@routes.Application.myfiles()">@Messages.get("application.general.myfiles")</a></li>
+                        <li><a href="@routes.Filesystem.index()">@Messages.get("application.general.myfiles")</a></li>
                         <li><a href="@routes.Application.settings()">@Messages.get("application.general.settings")</a></li>
                     </ul>
                 } else {
