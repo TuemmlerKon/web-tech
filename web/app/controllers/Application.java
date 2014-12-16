@@ -32,23 +32,6 @@ public class Application extends Controller {
         return ok(views.html.index.render(Messages.get("application.general.index"), user, News.find.all(), File.find.all()));
     }
 
-    public static Result test() {
-
-        JsonNode json = request().body().asJson();
-        if(json == null) {
-            return badRequest("Expecting Json data");
-        } else {
-            ObjectNode result = Json.newObject();
-            if (result != null) {
-                Array t = new Array<String>(json.asInt());
-                result.put("title", Messages.get("files.detele.list"));
-                //result.put("return", views.html.test.render(t);
-            }
-            return ok(result);
-        }
-    }
-
-
     public static Result gtc() {
         return ok(views.html.gtc.render(Messages.get("application.general.gtc")));
     }
