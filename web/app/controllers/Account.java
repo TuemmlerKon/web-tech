@@ -65,6 +65,7 @@ public class Account extends Controller {
             return redirect(controllers.routes.Account.login());
         }
 
+        session("userid", user.getId().toString());
         session("email", user.getEmail());
         session("prename", user.getPrename());
         session("surname", user.getSurname());
@@ -129,6 +130,7 @@ public class Account extends Controller {
         session("prename", "");
         session("surname", "");
         session("lastlogin", "");
+        session("userid", "");
 
         flash("success", Messages.get("user.logout.successful"));
         logger.debug("Logout: User successful logged out");
@@ -257,6 +259,7 @@ public class Account extends Controller {
         if(result == null || result.equals("")) return null;
 
         User user = new User();
+        user.setId(Long.parseLong(session("userid")));
         user.setEmail(session("email"));
         user.setPrename(session("prename"));
         user.setSurname(session("surname"));
@@ -296,6 +299,7 @@ public class Account extends Controller {
                 }
 
                 User user = new User();
+                user.setId(Long.parseLong(rs.getString("ID")));
                 user.setEmail(rs.getString("email"));
                 user.setPrename(rs.getString("prename"));
                 user.setSurname(rs.getString("surname"));

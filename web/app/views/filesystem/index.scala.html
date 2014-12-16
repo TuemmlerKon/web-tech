@@ -2,13 +2,24 @@
 
 @import play.i18n.Messages
 
+@cwd = {@Filesystem.getCWD}
+
+@buttons(withdelete: Boolean) = {
+    @if(withdelete) {
+        <button type="button" class="btn btn-danger btn-sm pull-right filesystem-action" id="deleteselected" data-url=""><span class="fa fa-remove"></span> @Messages.get("user.files.options.deleteselected")</button>
+    }
+    <button type="button" class="btn btn-success btn-sm pull-right filesystem-action" id="uploadfile" data-url=""><span class="fa fa-file"></span> @Messages.get("user.files.options.uploadfile")</button>
+    <button type="button" class="btn btn-info btn-sm pull-right filesystem-action" id="newfolder" data-url=""><span class="fa fa-folder"></span> @Messages.get("user.files.options.newfolder")</button>
+}
+
 @main(message) {
 
         <ol class="breadcrumb">
             <li class="text-muted"><span class="fa fa-folder"></span></li>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Testordner</a></li>
-            <li class="active">Textdateien</li>
+            <li class="text-muted"><a href="@controllers.routes.Filesystem.cwd(0)">Home</a></li>
+            @if(cwd!=null) {
+            <li><a href="#">@cwd.toString</a></li>
+            }
         </ol>
         <table class="table">
             <thead>
@@ -21,26 +32,55 @@
                     <th>@Messages.get("user.files.options")</th>
                 </tr>
             </thead>
-            <tfoot>
-                <tr>
-                    <td colspan="5">
-                        <button type="button" class="btn btn-danger btn-sm pull-right" id="deleteselected" data-url="">@Messages.get("user.files.options.deleteselected")</button>
-                    </td>
-                </tr>
-            </tfoot>
-            <tbody>
-                @for(file <- files) {
-                <tr>
-                    <td><input type="checkbox" class="multi-checkbox" data-value="@file.filename"></td>
-                    <td>@file.filename</td>
-                    <td>@file.createDate.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</td>
-                    <td>@(file.size / 1024) KBytes</td>
-                    <td>@file.service</td>
-                    <td>
-                        <a href="#" title="@Messages.get("user.files.options.delete")"><span class="fa fa-remove"></span></a>
-                    </td>
-                </tr>
-                }
-            </tbody>
+            @if(files.nonEmpty) {
+                <tfoot>
+                    <tr>
+                        <td colspan="6">
+                            @buttons(true)
+                        </td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @for(file <- files) {
+                    <tr>
+                        <td><input type="checkbox" class="multi-checkbox" data-value="@file.filename"></td>
+                        <td>
+                            @if(file.filetype == "folder") {
+                                <a href="@controllers.routes.Filesystem.cwd(file.id)">@file.filename</a>
+                            } else {
+                                <a href="@controllers.routes.Filesystem.download(file.id)">@file.filename</a>
+                            }
+                        </td>
+                        <td>@file.createDate.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</td>
+                        <td>
+                            @if(file.filetype == "file") {
+                                @(file.size / 1024) KBytes
+                            } else {
+                                @Messages.get("user.files.isfolder")
+                            }
+                        </td>
+                        <td>@file.service</td>
+                        <td>
+                            <a href="#" title="@Messages.get("user.files.options.delete")"><span class="fa fa-remove"></span></a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            } else {
+                <tfoot>
+                    <tr>
+                        <td colspan="6">
+                            @buttons(false)
+                        </td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="text-muted notabledata">
+                            @Messages.get("user.files.nofilesavailable")
+                        </td>
+                    </tr>
+                </tbody>
+            }
         </table>
 }

@@ -5,6 +5,8 @@ import play.data.validation.Constraints;
 
 
 public class User {
+
+    public Long id;
     @Constraints.Required
     public String prename;
     @Constraints.Required
@@ -16,6 +18,14 @@ public class User {
     @Constraints.Required
     public String password;
     public String password2;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public DateTime getCreatedate() {
         return createdate;

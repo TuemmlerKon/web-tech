@@ -17,11 +17,20 @@ public class File extends Model {
     @Constraints.Required
     public String filename;
 
-    @Constraints.Required
+    @ManyToOne
+    @JoinColumn(name = "parent_index", referencedColumnName = "id")
+    public File parent;
+
     public long size;
 
     @Constraints.Required
     public String service;
+
+    @Constraints.Required
+    public String filetype;
+
+    @Constraints.Required
+    public Long owner;
 
     @Formats.DateTime(pattern="dd/MM/yyyy")
     public Date createDate = new Date();
@@ -29,5 +38,13 @@ public class File extends Model {
     public static Finder<Long,File> find = new Finder<Long,File>(
             Long.class, File.class
     );
+
+    public String toString() {
+        return filename;
+    }
+
+    public Long toLong() {
+        return id;
+    }
 
 }
