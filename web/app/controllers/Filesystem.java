@@ -1,18 +1,29 @@
 package controllers;
 
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
 import com.avaje.ebean.Ebean;
 import models.File;
+import models.FileSocket;
+import models.NewsSocket;
 import models.User;
 import org.h2.store.fs.FileUtils;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.i18n.Messages;
+import play.libs.Akka;
+import play.libs.F;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.WebSocket;
+import scala.concurrent.duration.Duration;
+
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Filesystem extends Controller {
 
@@ -312,6 +323,29 @@ public class Filesystem extends Controller {
         if(!file.exists()) return true;
 
         return false;
+    }
+
+    public static WebSocket<String> filesWS() {
+        return new WebSocket<String>() {
+            public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
+                final ActorRef pingActor = Akka.system().actorOf(Props.create(FileSocket.class, in, out));
+                final Cancellable cancellable = Akka.system().scheduler().schedule(Duration.create(1, TimeUnit.SECONDS),
+                        Duration.create(20, TimeUnit.SECONDS),
+                        pingActor,
+                        "Files",
+                        Akka.system().dispatcher(),
+                        null
+                );
+
+                in.onClose(new F.Callback0() {
+                    @Override
+                    public void invoke() throws Throwable {
+                        cancellable.cancel();
+                    }
+                });
+            }
+
+        };
     }
 
 }

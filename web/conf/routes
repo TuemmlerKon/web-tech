@@ -23,7 +23,9 @@ POST        /neuedatei                    controllers.Filesystem.newFile()
 GET         /modal/neuerordner            controllers.Modal.newFolder()
 GET         /modal/neuedatei              controllers.Modal.newFile()
 GET         /modal/accountloeschen        controllers.Modal.rmAccount()
-
+#Websockets
+GET         /news/updates                 controllers.News.newsWS()
+GET         /files/updates                controllers.Filesystem.filesWS()
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                 controllers.Assets.at(path="/public", file)
 GET         /webjars/*file                controllers.WebJarAssets.at(file)

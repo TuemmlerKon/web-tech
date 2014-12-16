@@ -21,7 +21,7 @@ public class Application extends Controller {
 
 
         User user = Account.getCurrentUser();
-        return ok(views.html.index.render(Messages.get("application.general.index"), user, News.find.all(), File.find.all()));
+        return ok(views.html.index.render(Messages.get("application.general.index"), user));
     }
 
     public static Result gtc() {

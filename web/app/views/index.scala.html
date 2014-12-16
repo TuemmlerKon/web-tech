@@ -1,4 +1,4 @@
-@(message: String, User: models.User, news: List[News], files: List[File])
+@(message: String, User: models.User)
 
 @import play.i18n.Messages
 
@@ -36,7 +36,7 @@
         <div class="panel-heading">
             <h3 class="panel-title">Letzte Updates</h3>
         </div>
-        <div class="panel-body">
+        <div class="panel-body files">
             <table class="table">
                 <thead>
                     <tr>
@@ -47,14 +47,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for(file <- files) {
-                        <tr>
-                            <td>@file.createDate.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</td>
-                            <td>@file.filename</td>
-                            <td>@(file.size / 1024) KBytes</td>
-                            <td>@file.service</td>
-                        </tr>
-                    }
+
                 </tbody>
             </table>
         </div>
@@ -64,10 +57,8 @@
         <div class="panel-heading">
             <h3 class="panel-title">Neuigkeiten</h3>
         </div>
-        <div class="panel-body">
-            @for(entry <- news) {
-                <p><span class="text-muted">@entry.date.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</span>: <strong>@entry.name</strong> @entry.text</p>
-            }
+        <div class="panel-body news">
+
         </div>
     </div>
 
