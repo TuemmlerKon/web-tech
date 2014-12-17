@@ -1,6 +1,9 @@
 package controllers;
 
 import java.sql.*;
+
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.*;
@@ -9,6 +12,7 @@ import play.Logger;
 import play.data.DynamicForm;
 import play.db.*;
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import java.math.BigInteger;
@@ -21,7 +25,7 @@ import service.Mailer;
 
 public class Account extends Controller {
 
-    private static String SALT  = "q3gdt4wx$%ZGFEWSC$%XHZ!Q§X$ZA$§ger";
+    private static final String SALT  = "q3gdt4wx$%ZGFEWSC$%XHZ!Q§X$ZA$§ger";
 
     public static Logger.ALogger logger = play.Logger.of("application.controller.account");
 
@@ -29,14 +33,12 @@ public class Account extends Controller {
 
     public static Result login() {
 
-        String email = session("email");
+        User user = getCurrentUser();
 
-        if(email != null && !email.isEmpty()) {
+        if(user != null) {
             logger.debug("User is already logged in. Redirect to main page");
             return redirect(controllers.routes.Application.index());
         }
-
-        createTableIfNotExist();
 
         return ok(views.html.account.login.render(Messages.get("application.general.login"), Form.form(Login.class)));
     }
@@ -61,11 +63,8 @@ public class Account extends Controller {
             return redirect(controllers.routes.Account.login());
         }
 
-        session("userid", user.getId().toString());
-        session("email", user.getEmail());
-        session("prename", user.getPrename());
-        session("surname", user.getSurname());
-        session("lastlogin", user.getLastlogin() == null ? "" : user.getLastlogin().toLocalDateTime().toString());
+        session("user", Json.toJson(user).toString());
+
         //Nachricht dass alles gepasst hat
         flash("success", Messages.get("user.login.successful", user.getPrename()));
         logger.debug("Login: User "+user.getEmail()+" successful logged in");
@@ -85,7 +84,7 @@ public class Account extends Controller {
         String password = requestData.get("password");
         String password2 = requestData.get("password2");
 
-        User user = getUser(session("email"), oldpassword);
+        User user = getUser(getCurrentUser().getEmail(), oldpassword);
 
         if (user == null) {
             //wenn kein User gefunden wurde war das alte Passwort falsch
@@ -122,29 +121,22 @@ public class Account extends Controller {
 
     public static Result logout() {
 
-        String user = session("prename");
+        User user = getCurrentUser();
 
-        session("email", "");
-        session("prename", "");
-        session("surname", "");
-        session("lastlogin", "");
-        session("userid", "");
+        session("user", "");
 
-        flash("success", Messages.get("user.logout.successful", user));
+        flash("success", Messages.get("user.logout.successful", user.getPrename()));
         logger.debug("Logout: User successful logged out");
         return redirect(controllers.routes.Account.login());
     }
 
     public static Result register() {
-
-        createTableIfNotExist();
-
         return ok(views.html.account.register.render(Messages.get("user.register.head.title"), Form.form(User.class)));
     }
 
     public static Result rm() {
 
-        User user = Account.getCurrentUser();
+        User user = getCurrentUser();
 
         if(user == null) {
             logger.debug("Filesystem: User unauthenticated");
@@ -207,7 +199,7 @@ public class Account extends Controller {
 
                 //es gab keine Ergebnisse also können wir den Benutzer speichern.
                 //hierfür benutzen wir ein preparedStatement
-                PreparedStatement prep = connection.prepareStatement("INSERT INTO `user` SET `prename` = ?, `surname` = ?, `email` = ?, `password` = SHA1(?), `activation` = ?, `createdate` = NOW(), `lastlogin` = NULL;");
+                PreparedStatement prep = connection.prepareStatement("INSERT INTO `user` SET `prename` = ?, `surname` = ?, `email` = ?, `password` = SHA1(?), `activation` = ?, `createdate` = NOW(), `lastlogin` = NULL, `roles` = '"+User.ROLE_DEFAULT+"';");
                 prep.setString(1, user.getPrename());
                 prep.setString(2, user.getSurname());
                 prep.setString(3, user.getEmail());
@@ -298,17 +290,21 @@ public class Account extends Controller {
     }
 
     public static User getCurrentUser() {
-        String result = session("email");
-        if(result == null || result.equals("")) return null;
+        //schauen ob wir an die JSON Daten aus der Session kommen
+        String jsonData = session("user");
+        //wenn NULL oder leer können wir keine Daten lesen -> return null
+        if(jsonData == null || jsonData.equals("")) return null;
 
-        User user = new User();
-        user.setId(Long.parseLong(session("userid")));
-        user.setEmail(session("email"));
-        user.setPrename(session("prename"));
-        user.setSurname(session("surname"));
+        User user;
+        try {
+            //Mit dem ObjectMapper versuchen wir den JSON-String in ein Userobjekt umzuwandeln
+            ObjectMapper objectMapper = new ObjectMapper();
+            user = objectMapper.readValue(jsonData, User.class);
 
-        if(!session("lastlogin").isEmpty()) {
-            user.setLastlogin(DateTime.parse(session("lastlogin")));
+        } catch (Exception e) {
+            //wenn es zu einer Exception kam dann setzen wir user = null und melden das per logger
+            user = null;
+            logger.debug("Error while trying to read object from session");
         }
 
         return user;
@@ -320,6 +316,28 @@ public class Account extends Controller {
 
         public String generate() {
             return new BigInteger(130, random).toString(32);
+        }
+    }
+
+    public static void updateUser(User user) {
+
+        if (user == null) {
+            return;
+        }
+
+        PreparedStatement prep;
+        try {
+            prep = connection.prepareStatement("UPDATE `user` SET `prename` = ?, `surname` = ?, `email` = ?, `roles` = ? WHERE `user`.`ID` = ?;");
+            prep.setString(1, user.getPrename());
+            prep.setString(2, user.getSurname());
+            prep.setString(3, user.getEmail());
+            prep.setString(4, user.getRoles());
+            prep.setString(5, user.getSurname());
+            prep.execute();
+            prep.close();
+        }
+        catch (SQLException e) {
+            logger.error(e.getMessage());
         }
     }
 
@@ -346,6 +364,7 @@ public class Account extends Controller {
                 user.setEmail(rs.getString("email"));
                 user.setPrename(rs.getString("prename"));
                 user.setSurname(rs.getString("surname"));
+                user.setRoles(rs.getString("roles"));
                 user.setCreatedate(DateTime.parse(rs.getTimestamp("createdate").toLocalDateTime().toString()));
 
                 Timestamp timestamp = rs.getTimestamp("lastlogin");
@@ -367,34 +386,5 @@ public class Account extends Controller {
         }
 
         return null;
-    }
-
-    /**
-     * Erstellt eine neue Tabelle für die User in der Datenbank, falls diese noch nicht existiert
-     */
-    private static void createTableIfNotExist() {
-        Statement stmt;
-        try {
-            DatabaseMetaData dbm = connection.getMetaData();
-            ResultSet tables = dbm.getTables(null, null, "user", null);
-            if (!tables.next()) {
-                stmt = connection.createStatement();
-                stmt.execute("CREATE TABLE IF NOT EXISTS `user` (" +
-                        "`ID` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                        "  `prename` varchar(255) NOT NULL," +
-                        "  `surname` varchar(255) NOT NULL," +
-                        "  `email` varchar(255) NOT NULL," +
-                        "  `password` varchar(255) NOT NULL," +
-                        "  `activation` varchar(255) NOT NULL," +
-                        "  `createdate` datetime NOT NULL," +
-                        "  `lastlogin` datetime" +
-                        ") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
-                stmt.close();
-                logger.info("Created new table \" user \" in database!");
-            }
-        }
-        catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
     }
 }

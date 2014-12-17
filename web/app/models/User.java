@@ -1,10 +1,13 @@
 package models;
 
+import controllers.Account;
 import org.joda.time.DateTime;
 import play.data.validation.Constraints;
 
 
 public class User {
+
+    public static final String ROLE_DEFAULT  = "ROLE_USER";
 
     public Long id;
     @Constraints.Required
@@ -18,6 +21,25 @@ public class User {
     @Constraints.Required
     public String password;
     public String password2;
+    public String roles;
+
+    private boolean invalid;
+
+    public boolean isInvalid() {
+        return invalid;
+    }
+
+    public void updateDone() {
+        invalid = false;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
+    }
 
     public Long getId() {
         return id;
@@ -25,10 +47,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public DateTime getCreatedate() {
-        return createdate;
     }
 
     public void setCreatedate(DateTime createdate) {
@@ -75,11 +93,41 @@ public class User {
         this.password = password;
     }
 
-    public String getPassword2() {
-        return password2;
+    private boolean rmRole(User user, String role) {
+        //schauen ob überhaupt was übergeben wurde
+        if (role == null || role.isEmpty()) return false;
+        //nun schauen wir ob es vllt. die default role ist (die darf nicht gelöscht werden)
+        if (role.equals(User.ROLE_DEFAULT)) return false;
+        //prüfen ob die ROLE überhaupt existiert
+        //wenn ja geben wir trotzdem true zurück weil ja die ROLE nichtmehr da ist
+        if (!hasRole(role)) return true;
+        //ansonsten entfernen wir den INHALT aus der role
+        setRoles(role.replace(";" + role.toUpperCase(), ""));
+        //den Benutzer in der Datenbank updated
+        Account.updateUser(this);
+
+        return true;
     }
 
-    public void setPassword2(String password2) {
-        this.password2 = password2;
+    private boolean addRole(String role) {
+        //schauen ob überhaupt was übergeben wurde
+        if (role == null || role.isEmpty()) return false;
+        //prüfen ob die ROLE vielleicht schon existiert
+        //wenn ja geben wir trotzdem true zurück weil ja die ROLE da steht und die Rechte existieren
+        if (hasRole(role)) return true;
+        //wenn die ROLE nicht drin ist, schreiben wir sie jetzt rein
+        setRoles(role+";"+role.toUpperCase());
+        //den Benutzer in der Datenbank updated
+        Account.updateUser(this);
+
+        return true;
     }
+
+    private boolean hasRole(String role) {
+        //schauen ob überhaupt was übergeben wurde
+        if (role == null || role.isEmpty()) return false;
+        //jetzt prüfen wir ob die ROLE in seinen Rollen steht
+        return getRoles().contains(role.toUpperCase());
+    }
+
 }
