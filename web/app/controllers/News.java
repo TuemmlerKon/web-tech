@@ -5,6 +5,7 @@ import akka.actor.Cancellable;
 import akka.actor.Props;
 import models.NewsSocket;
 import play.Logger;
+import play.libs.F.Callback0;
 import play.mvc.WebSocket;
 import play.libs.Akka;
 import play.libs.F;
@@ -30,11 +31,8 @@ public class News extends Controller {
                         null
                 );
 
-                in.onClose(new F.Callback0() {
-                    @Override
-                    public void invoke() throws Throwable {
-                        cancellable.cancel();
-                    }
+                in.onClose(() -> {
+                    cancellable.cancel();
                 });
             }
 

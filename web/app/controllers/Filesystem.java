@@ -6,7 +6,6 @@ import akka.actor.Props;
 import com.avaje.ebean.Ebean;
 import models.File;
 import models.FileSocket;
-import models.NewsSocket;
 import models.User;
 import org.h2.store.fs.FileUtils;
 import play.Logger;
@@ -14,7 +13,6 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.i18n.Messages;
 import play.libs.Akka;
-import play.libs.F;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -200,7 +198,8 @@ public class Filesystem extends Controller {
         Http.MultipartFormData.FilePart data = body.getFile("filename");
         if (data != null) {
             String fileName = data.getFilename();
-            String contentType = data.getContentType();
+            //ToDo: Den Contenttype hier auch mit in die Datenbank schreiben. Dann ist der Download einfacher
+            //String contentType = data.getContentType();
             java.io.File file = data.getFile();
             java.io.File test = new java.io.File(ROOT_FOLDER, user.getId().toString()+"/"+folderid+fileName);
 
@@ -323,9 +322,7 @@ public class Filesystem extends Controller {
             return true;
         }
         //hier nochmal schauen ob der Ordner weg ist. Wenn ja wars erfolgreich sonst false
-        if(!file.exists()) return true;
-
-        return false;
+        return !file.exists();
     }
 
     public static WebSocket<String> filesWS() {
@@ -340,11 +337,8 @@ public class Filesystem extends Controller {
                         null
                 );
 
-                in.onClose(new F.Callback0() {
-                    @Override
-                    public void invoke() throws Throwable {
-                        cancellable.cancel();
-                    }
+                in.onClose(() -> {
+                    cancellable.cancel();
                 });
             }
 

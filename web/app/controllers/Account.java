@@ -6,7 +6,6 @@ import com.typesafe.config.ConfigFactory;
 import models.*;
 import org.joda.time.DateTime;
 import play.Logger;
-import play.api.libs.Codecs;
 import play.data.DynamicForm;
 import play.db.*;
 import play.data.Form;
@@ -16,15 +15,12 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
-import java.util.Date;
 
 import play.i18n.Messages;
 import service.Mailer;
 
 public class Account extends Controller {
 
-    private static String TABLE = "user";
     private static String SALT  = "q3gdt4wx$%ZGFEWSC$%XHZ!Q§X$ZA$§ger";
 
     public static Logger.ALogger logger = play.Logger.of("application.controller.account");
@@ -105,9 +101,9 @@ public class Account extends Controller {
             return redirect(controllers.routes.Application.settings());
         }
         //wenn hier angekommen dann passt alles also passwort update
-        PreparedStatement stmt = null;
+        PreparedStatement stmt;
         try {
-            stmt = connection.prepareStatement("UPDATE " + TABLE + " SET `password` = SHA1(?) WHERE `email` = ?;");
+            stmt = connection.prepareStatement("UPDATE `user` SET `password` = SHA1(?) WHERE `email` = ?;");
             stmt.setString(2, user.getEmail());
             stmt.setString(1, password+SALT);
             stmt.execute();
@@ -164,7 +160,7 @@ public class Account extends Controller {
                 //wenn die Dateien erfolgreich gelöscht wurden, können wir jetzt den Benutzer aus dem System löschen und ihn abmelden
                 try {
                     Statement stmt = connection.createStatement();
-                    stmt.execute("DELETE FROM "+TABLE+" WHERE `ID` = "+user.getId()+";");
+                    stmt.execute("DELETE FROM `user` WHERE `ID` = "+user.getId()+";");
                     stmt.close();
                     //Wenn das löschen des Users aus der Datenbank erfolgreich war
                     flash("success", Messages.get("account.rmaccount.success"));
@@ -198,9 +194,9 @@ public class Account extends Controller {
         if (user == null) {
             return redirect(controllers.routes.Account.register());
         }
-        PreparedStatement stmt = null;
+        PreparedStatement stmt;
         try {
-            stmt = connection.prepareStatement("SELECT * FROM " + TABLE + " WHERE " + TABLE + ".email = ?;");
+            stmt = connection.prepareStatement("SELECT * FROM `user` WHERE `user`.email = ?;");
             stmt.setString(1, user.getEmail());
             stmt.execute();
             ResultSet rs = stmt.getResultSet();
@@ -211,7 +207,7 @@ public class Account extends Controller {
 
                 //es gab keine Ergebnisse also können wir den Benutzer speichern.
                 //hierfür benutzen wir ein preparedStatement
-                PreparedStatement prep = connection.prepareStatement("INSERT INTO "+TABLE+" SET `prename` = ?, `surname` = ?, `email` = ?, `password` = SHA1(?), `activation` = ?, `createdate` = NOW(), `lastlogin` = NULL;");
+                PreparedStatement prep = connection.prepareStatement("INSERT INTO `user` SET `prename` = ?, `surname` = ?, `email` = ?, `password` = SHA1(?), `activation` = ?, `createdate` = NOW(), `lastlogin` = NULL;");
                 prep.setString(1, user.getPrename());
                 prep.setString(2, user.getSurname());
                 prep.setString(3, user.getEmail());
@@ -258,16 +254,16 @@ public class Account extends Controller {
             return redirect(controllers.routes.Account.register());
         }
 
-        PreparedStatement prep = null;
+        PreparedStatement prep;
         try {
-            prep = connection.prepareStatement("SELECT * FROM "+TABLE+" WHERE `activation` = ?;");
+            prep = connection.prepareStatement("SELECT * FROM `user` WHERE `activation` = ?;");
             prep.setString(1, key);
             prep.execute();
             ResultSet rs = prep.getResultSet();
             if (rs.next()) {
                 //der Aktivierungskey war vorhanden, wir können den Benutzer also aktivieren
                 prep.close();
-                prep = connection.prepareStatement("UPDATE " + TABLE + " SET `activation` = '' WHERE `activation` = ?;");
+                prep = connection.prepareStatement("UPDATE `user` SET `activation` = '' WHERE `activation` = ?;");
                 prep.setString(1, key);
                 prep.execute();
                 prep.close();
@@ -328,10 +324,10 @@ public class Account extends Controller {
     }
 
     private static User getUser(String email, String password) {
-        PreparedStatement prep = null;
+        PreparedStatement prep;
 
         try {
-            prep = connection.prepareStatement("SELECT * FROM "+TABLE+" WHERE `email` = ? AND `password` = SHA1(?);");
+            prep = connection.prepareStatement("SELECT * FROM `user` WHERE `email` = ? AND `password` = SHA1(?);");
             prep.setString(1, email);
             prep.setString(2, password+SALT);
             prep.execute();
@@ -358,7 +354,7 @@ public class Account extends Controller {
                 }
 
                 //da sich der Benutzer ja erfolgreich angemeldet hat updaten wir jetzt noch den letzten Login in der Datenbank
-                prep.execute("UPDATE "+TABLE+" SET `lastlogin` = NOW() WHERE `email` = '"+user.getEmail()+"';");
+                prep.execute("UPDATE `user` SET `lastlogin` = NOW() WHERE `email` = '"+user.getEmail()+"';");
                 prep.close();
                 return user;
             } else {
@@ -377,10 +373,10 @@ public class Account extends Controller {
      * Erstellt eine neue Tabelle für die User in der Datenbank, falls diese noch nicht existiert
      */
     private static void createTableIfNotExist() {
-        Statement stmt = null;
+        Statement stmt;
         try {
             DatabaseMetaData dbm = connection.getMetaData();
-            ResultSet tables = dbm.getTables(null, null, TABLE, null);
+            ResultSet tables = dbm.getTables(null, null, "user", null);
             if (!tables.next()) {
                 stmt = connection.createStatement();
                 stmt.execute("CREATE TABLE IF NOT EXISTS `user` (" +
@@ -394,7 +390,7 @@ public class Account extends Controller {
                         "  `lastlogin` datetime" +
                         ") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
                 stmt.close();
-                logger.info("Created new table " + TABLE + " in database!");
+                logger.info("Created new table \" user \" in database!");
             }
         }
         catch (SQLException e) {

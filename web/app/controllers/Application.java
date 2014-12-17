@@ -1,7 +1,5 @@
 package controllers;
 
-import models.File;
-import models.News;
 import models.User;
 import play.mvc.Controller;
 import play.mvc.Result;
