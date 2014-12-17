@@ -17,8 +17,14 @@ public class Mailer extends Throwable {
 
     private String data;
 
+    private String prefix;
 
     public Mailer(String receiver, String sender, String subject, String data) {
+        Config conf = ConfigFactory.load();
+        this.prefix = conf.getString("smtp.subjectprefix");
+        //prüfen ob der prefix leer ist! Wenn nicht machen wir ans ende noch ein Leerzeichen
+        if (!this.prefix.isEmpty()) this.prefix += " ";
+
         //ein paar überprüfungen erledigen
         this.sender = !sender.isEmpty() ? sender: null;
         this.receiver = !receiver.isEmpty() ? receiver: null;
@@ -30,7 +36,7 @@ public class Mailer extends Throwable {
         //Code nur ausführen, wenn in alle Variablen auch etwas gegeben ist.
         if (this.sender != null && this.subject != null && this.receiver != null && this.data != null) {
             MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
-            mail.setSubject(this.subject);
+            mail.setSubject(this.prefix+this.subject);
             mail.setRecipient(this.receiver);
             mail.setFrom(this.sender);
             mail.send(this.data);

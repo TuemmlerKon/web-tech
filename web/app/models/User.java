@@ -3,9 +3,12 @@ package models;
 import controllers.Account;
 import org.joda.time.DateTime;
 import play.data.validation.Constraints;
+import scala.math.BigInt;
+
+import java.io.Serializable;
 
 
-public class User {
+public class User implements Serializable{
 
     public static final String ROLE_DEFAULT  = "ROLE_USER";
 
@@ -22,8 +25,25 @@ public class User {
     public String password;
     public String password2;
     public String roles;
-
+    public Integer storage;
+    public Integer used;
     private boolean invalid;
+
+    public Integer getUsed() {
+        return used;
+    }
+
+    public void setUsed(Integer used) {
+        this.used = used;
+    }
+
+    public Integer getStorage() {
+        return storage;
+    }
+
+    public void setStorage(Integer storage) {
+        this.storage = storage;
+    }
 
     public boolean isInvalid() {
         return invalid;
@@ -129,5 +149,4 @@ public class User {
         //jetzt prüfen wir ob die ROLE in seinen Rollen steht
         return getRoles().contains(role.toUpperCase());
     }
-
 }

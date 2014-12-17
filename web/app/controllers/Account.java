@@ -1,7 +1,10 @@
 package controllers;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.sql.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
@@ -22,6 +25,7 @@ import java.sql.Statement;
 
 import play.i18n.Messages;
 import service.Mailer;
+import service.Serializer;
 
 public class Account extends Controller {
 
@@ -63,7 +67,12 @@ public class Account extends Controller {
             return redirect(controllers.routes.Account.login());
         }
 
-        session("user", Json.toJson(user).toString());
+        try {
+            session("user", Serializer.toString(user));
+            logger.debug("Writing userdata to session");
+        } catch (IOException e) {
+            logger.debug("Error while trying to write object to session "+e);
+        }
 
         //Nachricht dass alles gepasst hat
         flash("success", Messages.get("user.login.successful", user.getPrename()));
@@ -102,7 +111,7 @@ public class Account extends Controller {
         //wenn hier angekommen dann passt alles also passwort update
         PreparedStatement stmt;
         try {
-            stmt = connection.prepareStatement("UPDATE `user` SET `password` = SHA1(?) WHERE `email` = ?;");
+            stmt = connection.prepareStatement("UPDATE `user` SET `password` = SHA2(?, 512) WHERE `email` = ?;");
             stmt.setString(2, user.getEmail());
             stmt.setString(1, password+SALT);
             stmt.execute();
@@ -183,6 +192,10 @@ public class Account extends Controller {
         Form<User> userForm = Form.form(User.class);
         User user = userForm.bindFromRequest().get();
 
+        Config conf = ConfigFactory.load();
+
+        Integer standardStorage = conf.getInt("cloudplex.standardstorage");
+
         if (user == null) {
             return redirect(controllers.routes.Account.register());
         }
@@ -199,18 +212,19 @@ public class Account extends Controller {
 
                 //es gab keine Ergebnisse also können wir den Benutzer speichern.
                 //hierfür benutzen wir ein preparedStatement
-                PreparedStatement prep = connection.prepareStatement("INSERT INTO `user` SET `prename` = ?, `surname` = ?, `email` = ?, `password` = SHA1(?), `activation` = ?, `createdate` = NOW(), `lastlogin` = NULL, `roles` = '"+User.ROLE_DEFAULT+"';");
+                PreparedStatement prep = connection.prepareStatement("INSERT INTO `user` SET `prename` = ?, `surname` = ?, `email` = ?, `password` = SHA2(?, 512), `activation` = ?, `createdate` = NOW(), `lastlogin` = NULL, `storage` = ?, `roles` = '"+User.ROLE_DEFAULT+"';");
                 prep.setString(1, user.getPrename());
                 prep.setString(2, user.getSurname());
                 prep.setString(3, user.getEmail());
                 prep.setString(4, user.getPassword()+SALT);
                 prep.setString(5, code);
+                prep.setInt(6, standardStorage);
                 prep.execute();
                 prep.close();
                 //Die Aktivierungs-email versenden
                 String url = controllers.routes.Account.activation(code).absoluteURL(request());
                 String data = Messages.get("user.activation.email.text", url);
-                Config conf = ConfigFactory.load();
+
                 if(conf.getBoolean("smtp.enabled")) {
                     new Mailer(user.getEmail(), conf.getString("smtp.from"), Messages.get("user.activation.email.subject.sent"), data).send();
                 } else {
@@ -292,22 +306,42 @@ public class Account extends Controller {
     public static User getCurrentUser() {
         //schauen ob wir an die JSON Daten aus der Session kommen
         String jsonData = session("user");
+
         //wenn NULL oder leer können wir keine Daten lesen -> return null
         if(jsonData == null || jsonData.equals("")) return null;
 
-        User user;
+        Object user;
         try {
             //Mit dem ObjectMapper versuchen wir den JSON-String in ein Userobjekt umzuwandeln
             ObjectMapper objectMapper = new ObjectMapper();
-            user = objectMapper.readValue(jsonData, User.class);
+            user = Serializer.fromString(jsonData);
 
         } catch (Exception e) {
             //wenn es zu einer Exception kam dann setzen wir user = null und melden das per logger
             user = null;
-            logger.debug("Error while trying to read object from session");
+            logger.debug("Error while trying to read object from session"+e);
         }
 
-        return user;
+        return (User)user;
+    }
+
+    public static boolean inkreaseStorage(User user, Integer ammount) {
+        return inkreaseStorage(user, ammount, false);
+    }
+
+    public static boolean inkreaseStorage(User user, Integer ammount, boolean inkrement) {
+
+        if (user == null) {
+            return false;
+        }
+
+        if (inkrement) {
+            ammount = user.getStorage()+ammount;
+        }
+
+        user.setStorage(ammount);
+
+        return updateUser(user);
     }
 
     private final class generateCode {
@@ -319,33 +353,36 @@ public class Account extends Controller {
         }
     }
 
-    public static void updateUser(User user) {
+    public static boolean updateUser(User user) {
 
         if (user == null) {
-            return;
+            return false;
         }
 
         PreparedStatement prep;
         try {
-            prep = connection.prepareStatement("UPDATE `user` SET `prename` = ?, `surname` = ?, `email` = ?, `roles` = ? WHERE `user`.`ID` = ?;");
+            prep = connection.prepareStatement("UPDATE `user` SET `prename` = ?, `surname` = ?, `email` = ?, `roles` = ?, `storage` = ?, `storage_used` = ? WHERE `user`.`ID` = ?;");
             prep.setString(1, user.getPrename());
             prep.setString(2, user.getSurname());
             prep.setString(3, user.getEmail());
             prep.setString(4, user.getRoles());
-            prep.setString(5, user.getSurname());
+            prep.setInt(5, user.getStorage());
+            prep.setInt(6, user.getUsed());
+            prep.setLong(7, user.getId());
             prep.execute();
             prep.close();
         }
         catch (SQLException e) {
             logger.error(e.getMessage());
         }
+        return true;
     }
 
     private static User getUser(String email, String password) {
         PreparedStatement prep;
 
         try {
-            prep = connection.prepareStatement("SELECT * FROM `user` WHERE `email` = ? AND `password` = SHA1(?);");
+            prep = connection.prepareStatement("SELECT * FROM `user` WHERE `email` = ? AND `password` = SHA2(?, 512);");
             prep.setString(1, email);
             prep.setString(2, password+SALT);
             prep.execute();
@@ -365,6 +402,8 @@ public class Account extends Controller {
                 user.setPrename(rs.getString("prename"));
                 user.setSurname(rs.getString("surname"));
                 user.setRoles(rs.getString("roles"));
+                user.setStorage(rs.getInt("storage"));
+                user.setUsed(rs.getInt("storage_used"));
                 user.setCreatedate(DateTime.parse(rs.getTimestamp("createdate").toLocalDateTime().toString()));
 
                 Timestamp timestamp = rs.getTimestamp("lastlogin");
@@ -386,5 +425,28 @@ public class Account extends Controller {
         }
 
         return null;
+    }
+
+    public static String getBarClass() {
+        String cssClass = "";
+        int percent = getPercent();
+        if (percent <= 80) cssClass = "progress-bar-success";
+        if (percent > 80) cssClass = "progress-bar-warning";
+        if (percent > 95) cssClass = "progress-bar-danger";
+
+        return cssClass;
+    }
+
+    public static int getPercent() {
+        User user = getCurrentUser();
+        Integer percent = 0;
+
+        if(user.getUsed() > 0) {
+            percent = user.getUsed()/(user.getStorage()/100);
+        } else {
+            percent = 0;
+        }
+
+        return percent;
     }
 }
