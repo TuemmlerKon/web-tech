@@ -1,5 +1,6 @@
 *.class
 .idea
+.idea_modules
 *.iml
 *.sql
 # Mobile Tools for Java (J2ME)
