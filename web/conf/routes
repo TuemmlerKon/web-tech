@@ -16,6 +16,7 @@ GET         /aktivierung                  controllers.Account.activation(key = "
 GET         /aktivierung/:key             controllers.Account.activation(key: String)
 POST        /accountloeschen              controllers.Account.rm()
 GET         /meine-dateien                controllers.Filesystem.index()
+GET         /json/files                   controllers.Filesystem.jsonFilesList()
 GET         /cwd/:folder                  controllers.Filesystem.cwd(folder: Long)
 GET         /download/:file               controllers.Filesystem.download(file: Long)
 POST        /neuerordner                  controllers.Filesystem.newFolder()

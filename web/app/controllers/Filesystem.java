@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 import com.avaje.ebean.Ebean;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.File;
 import models.FileSocket;
 import models.User;
@@ -13,6 +14,7 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.i18n.Messages;
 import play.libs.Akka;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -49,6 +51,25 @@ public class Filesystem extends Controller {
         List<File> list = File.find.where().eq("owner", user.getId().toString()).eq("parent_index", cwd).findList();
 
         return ok(views.html.filesystem.index.render(Messages.get("application.general.myfiles"), list));
+    }
+
+    public static Result jsonFilesList() {
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
+            logger.debug("Filesystem AJAX Request: User unauthenticated");
+            return notFound();
+        }
+
+        File dir = getCWD();
+        String cwd = null;
+        if (dir != null) {
+            cwd = dir.id.toString();
+        }
+
+        List<File> list = File.find.where().eq("owner", user.getId().toString()).eq("parent_index", cwd).findList();
+
+        return ok(Json.toJson(list));
     }
 
     public static Result cwd(Long folder) {

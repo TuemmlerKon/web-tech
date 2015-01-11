@@ -10,6 +10,7 @@
     }
     <button type="button" class="btn btn-success btn-sm pull-right filesystem-action modal-action" id="uploadfile" data-requesturl="@controllers.routes.Modal.newFile()"><span class="fa fa-file"></span> @Messages.get("user.files.options.uploadfile")</button>
     <button type="button" class="btn btn-info btn-sm pull-right filesystem-action modal-action" data-requesturl="@controllers.routes.Modal.newFolder()" id="newfolder" data-url=""><span class="fa fa-folder"></span> @Messages.get("user.files.options.newfolder")</button>
+    <button type="button" class="btn btn-sm pull-right btn-refresh" id="refresh" onclick="refresh('.table.filesystem tbody', '@controllers.routes.Filesystem.jsonFilesList()');"><span class="fa fa-refresh"></span> @Messages.get("user.files.options.refresh")</button>
 }
 
 @main(message) {
@@ -18,10 +19,10 @@
             <li class="text-muted"><span class="fa fa-folder"></span></li>
             <li class="text-muted"><a href="@controllers.routes.Filesystem.cwd(0)">Home</a></li>
             @if(cwd!=null) {
-            <li><a href="#">@cwd.toString</a></li>
+            <li><a href="#">@cwd.toString()</a></li>
             }
         </ol>
-        <table class="table">
+        <table class="table filesystem">
             <thead>
                 <tr>
                     <th><input type="checkbox" class="multi-checkbox master"></th>
@@ -32,55 +33,19 @@
                     <th>@Messages.get("user.files.options")</th>
                 </tr>
             </thead>
-            @if(files.nonEmpty) {
-                <tfoot>
-                    <tr>
-                        <td colspan="6">
-                            @buttons(true)
-                        </td>
-                    </tr>
-                </tfoot>
-                <tbody>
-                    @for(file <- files) {
-                    <tr>
-                        <td><input type="checkbox" class="multi-checkbox" data-value="@file.filename"></td>
-                        <td>
-                            @if(file.filetype == "folder") {
-                                <a href="@controllers.routes.Filesystem.cwd(file.id)">@file.filename</a>
-                            } else {
-                                <a href="@controllers.routes.Filesystem.download(file.id)">@file.filename</a>
-                            }
-                        </td>
-                        <td>@file.createDate.format("dd.mm.YYYY HH:MM") @Messages.get("user.files.clock")</td>
-                        <td>
-                            @if(file.filetype == "file") {
-                                @(file.size) Bytes
-                            } else {
-                                @Messages.get("user.files.isfolder")
-                            }
-                        </td>
-                        <td>@file.service</td>
-                        <td>
-                            <a href="#" title="@Messages.get("user.files.options.delete")"><span class="fa fa-remove"></span></a>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            } else {
-                <tfoot>
-                    <tr>
-                        <td colspan="6">
-                            @buttons(false)
-                        </td>
-                    </tr>
-                </tfoot>
-                <tbody>
-                    <tr>
-                        <td colspan="6" class="text-muted notabledata">
-                            @Messages.get("user.files.nofilesavailable")
-                        </td>
-                    </tr>
-                </tbody>
-            }
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                    @buttons(true)
+                    </td>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr>
+                    <td colspan="6" class="loader">
+                        <img src="@routes.Assets.at("ajax-loader.gif")" title="Loading" alt="Loading">
+                    </td>
+                </tr>
+            </tbody>
         </table>
 }

@@ -68,6 +68,7 @@ user.files.options.deleteselected=Auswahl löschen
 user.files.options.uploadfile=Datei hochladen
 user.files.nofilesavailable=Aktuell sind keine Dateien oder Ordner vorhanden
 user.files.options.newfolder=Neuer Ordner
+user.files.options.refresh=Aktualisieren
 user.files.isfolder=
 filesystem.folder.notfound=Datei oder Ordner wurde nicht gefunden
 filesystem.folder.error=Es trat ein Fehler beim anlegen des Ordners auf
