@@ -46,7 +46,7 @@ function refresh(selector, data_source) {
 
       },
       error : function(data) {
-         alert("failed");
+         //alert("failed");
       }
    });
 }
