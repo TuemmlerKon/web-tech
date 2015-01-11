@@ -11,6 +11,7 @@ import java.io.Serializable;
 public class User implements Serializable{
 
     public static final String ROLE_DEFAULT  = "ROLE_USER";
+    public static final String ROLE_ADMIN  = "ROLE_ADMIN";
 
     public Long id;
     @Constraints.Required
@@ -143,10 +144,15 @@ public class User implements Serializable{
         return true;
     }
 
-    private boolean hasRole(String role) {
+    public boolean hasRole(String role) {
         //schauen ob überhaupt was übergeben wurde
         if (role == null || role.isEmpty()) return false;
         //jetzt prüfen wir ob die ROLE in seinen Rollen steht
         return getRoles().contains(role.toUpperCase());
     }
+
+    public boolean isAdmin() {
+        return hasRole(User.ROLE_ADMIN);
+    }
+
 }
