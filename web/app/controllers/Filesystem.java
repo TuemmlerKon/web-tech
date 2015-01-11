@@ -326,9 +326,12 @@ public class Filesystem extends Controller {
     }
 
     public static WebSocket<String> filesWS() {
+
+        User user = Account.getCurrentUser();
+
         return new WebSocket<String>() {
             public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
-                final ActorRef pingActor = Akka.system().actorOf(Props.create(FileSocket.class, in, out));
+                final ActorRef pingActor = Akka.system().actorOf(Props.create(FileSocket.class, in, out, user));
                 final Cancellable cancellable = Akka.system().scheduler().schedule(Duration.create(1, TimeUnit.SECONDS),
                         Duration.create(20, TimeUnit.SECONDS),
                         pingActor,

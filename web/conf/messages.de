@@ -75,6 +75,7 @@ filesystem.file.notfound=Datei oder Ordner wurde nicht gefunden
 filesystem.modal.newfolder.title=Neuen Ordner anlegen
 filesystem.modal.newfolder.text=Bitte geben Sie einen Ordnernamen ein
 filesystem.model.enterfoldername=Name eingeben
+filesystem.modal.newfile.title=Neue Datei hinzufügen
 filesystem.folder.creationsuccess=Ordner "{0}" wurde erfolgreich angelegt
 filesystem.folder.creationerror=Ordner "{0}" existiert bereits
 application.account.yesremove=JA! JETZT LÖSCHEN

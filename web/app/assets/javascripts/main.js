@@ -1,5 +1,7 @@
 $(function() {
 
+   function pad(n) {return (n<10 ? '0'+n : n);}
+
    function bytesToSize(bytes) {
       var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
       if (bytes == 0) return 'n/a';
@@ -56,7 +58,8 @@ $(function() {
       var news = JSON.parse(event.data);
       $('.panel-body.news').html("");
       for(i=0;i<news.length;i++) {
-         $('.panel-body.news').append('<p><span class="text-muted">'+news[i]['date']+'</span>: <strong>'+news[i]['name']+'</strong> '+news[i]['text']+'</p>');
+         var date = new Date(news[i]['date']);
+         $('.panel-body.news').append('<p><span class="text-muted">'+pad(date.getDate())+"."+pad(date.getMonth())+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+' Uhr</span>: <strong>'+news[i]['name']+'</strong> '+news[i]['text']+'</p>');
       }
    };
    newsSocket.onmessage = nreceiveEvent
@@ -67,8 +70,8 @@ $(function() {
       $('.panel-body.files tbody').html("");
       for(i=0;i<files.length;i++) {
          var date = new Date(files[i]['createDate'])
-         var val = "<tr>" +
-                   "<td>"+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+" Uhr</td>" +
+         var val = "<tr>"+
+                   "<td>"+pad(date.getDate())+"."+pad(date.getMonth())+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" Uhr</td>" +
                    "<td>"+files[i]['filename']+"</td>" +
                    "<td>"+bytesToSize(files[i]['size'])+"</td>" +
                    "<td>"+files[i]['service']+"</td>" +
