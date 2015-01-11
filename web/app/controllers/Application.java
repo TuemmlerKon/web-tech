@@ -12,13 +12,14 @@ public class Application extends Controller {
 
 
     public static Result index() {
-        if(Account.getCurrentUser() == null) {
+
+        User user = Account.getCurrentUser();
+
+        if(user == null) {
             logger.debug("Index: User unauthenticated");
             return redirect(controllers.routes.Account.login());
         }
 
-
-        User user = Account.getCurrentUser();
         return ok(views.html.index.render(Messages.get("application.general.index"), user));
     }
 
@@ -31,6 +32,12 @@ public class Application extends Controller {
     }
 
     public static Result settings() {
+
+        if(Account.getCurrentUser() == null) {
+            logger.debug("Index: User unauthenticated");
+            return redirect(controllers.routes.Account.login());
+        }
+
         return ok(views.html.settings.render(Messages.get("application.general.settings")));
     }
 }
