@@ -152,6 +152,7 @@ public class User implements Serializable{
     }
 
     public boolean isAdmin() {
+        //Wir überprüfen einfach ob der Benutzer die Rolle ROLE_ADMIN hat und geben das Ergebnis zurück
         return hasRole(User.ROLE_ADMIN);
     }
 
