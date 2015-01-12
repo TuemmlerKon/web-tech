@@ -67,17 +67,21 @@ public class Account extends Controller {
             return redirect(controllers.routes.Account.login());
         }
 
+        writeUserToSession(user);
+
+        //Nachricht dass alles gepasst hat
+        flash("success", Messages.get("user.login.successful", user.getPrename()));
+        logger.debug("Login: User "+user.getEmail()+" successful logged in");
+        return redirect(controllers.routes.Application.index());
+    }
+
+    private static void writeUserToSession(User user) {
         try {
             session("user", Serializer.toString(user));
             logger.debug("Writing userdata to session");
         } catch (IOException e) {
             logger.debug("Error while trying to write object to session "+e);
         }
-
-        //Nachricht dass alles gepasst hat
-        flash("success", Messages.get("user.login.successful", user.getPrename()));
-        logger.debug("Login: User "+user.getEmail()+" successful logged in");
-        return redirect(controllers.routes.Application.index());
     }
 
     public static Result changePassword() {
@@ -325,21 +329,26 @@ public class Account extends Controller {
         return (User)user;
     }
 
-    public static boolean inkreaseStorage(User user, Integer ammount) {
+    public static boolean setStorage(User user, Integer ammount) {
         return inkreaseStorage(user, ammount, false);
     }
 
     public static boolean inkreaseStorage(User user, Integer ammount, boolean inkrement) {
 
         if (user == null) {
+            Logger.debug("User not found");
             return false;
         }
 
         if (inkrement) {
-            ammount = user.getStorage()+ammount;
+            ammount = user.getUsed()+ammount;
         }
 
-        user.setStorage(ammount);
+        if(ammount > user.getStorage()) {
+            return false;
+        }
+
+        user.setUsed(ammount);
 
         return updateUser(user);
     }
@@ -375,6 +384,9 @@ public class Account extends Controller {
         catch (SQLException e) {
             logger.error(e.getMessage());
         }
+
+        writeUserToSession(user);
+
         return true;
     }
 
@@ -446,6 +458,8 @@ public class Account extends Controller {
         } else {
             percent = 0;
         }
+
+        Logger.debug("Storage: "+user.getStorage()+" Used: "+user.getUsed());
 
         return percent;
     }

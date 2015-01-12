@@ -70,6 +70,7 @@ user.files.nofilesavailable=Aktuell sind keine Dateien oder Ordner vorhanden
 user.files.options.newfolder=Neuer Ordner
 user.files.options.refresh=Aktualisieren
 user.files.isfolder=
+filesystem.storage.exceeded=Der verfügbare Speicherplatz ist aufgebraucht!
 filesystem.folder.notfound=Datei oder Ordner wurde nicht gefunden
 filesystem.folder.error=Es trat ein Fehler beim anlegen des Ordners auf
 filesystem.file.notfound=Datei oder Ordner wurde nicht gefunden

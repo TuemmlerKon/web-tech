@@ -240,10 +240,18 @@ public class Filesystem extends Controller {
                 f_obj.setService("lokal");
                 f_obj.setOwner(user.getId());
                 f_obj.setParent(getCWD());
-                Ebean.save(f_obj);
 
-                logger.debug("Filesystem: Successful fileupload of "+fileName+" for user "+user.getEmail());
-                flash("success", "File uploaded");
+                if(Account.inkreaseStorage(user, (int)test.length(), true)) {
+                    Ebean.save(f_obj);
+                    logger.debug("Filesystem: Successful fileupload of "+fileName+" for user "+user.getEmail());
+                    flash("success", "File uploaded");
+                } else {
+                    //wenn das Dateilimit erreicht ist, wird die Datei nicht in die Datenbank geschrieben und die Datei selbst gelöscht
+                    file.delete();
+                    //Der Benutzer hat sein Speicherlimit überschritten
+                    flash("error", Messages.get("filesystem.storage.exceeded"));
+                    Logger.debug("User "+user.getEmail()+" exceeded his storage limit of "+user.getStorage()+" Bytes");
+                }
             }
         } else {
             logger.debug("Filesystem: Error while uploading file for user "+user.getEmail());
