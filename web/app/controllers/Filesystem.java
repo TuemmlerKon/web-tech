@@ -174,7 +174,7 @@ public class Filesystem extends Controller {
         if (folder == null || !folder.filetype.equals(FILETYPE_FOLDER)) {
             //wenn null zurückgegeben wurde (Besitzer falsch oder nicht gefunden)
             //oder wenn der Dateityp kein Ordner ist
-            logger.debug("Filesystem: Item is no folder");
+            logger.debug("Filesystem: getCWD: Item is no folder");
             return null;
         }
         //ansonsten geben wir die Datei zurück
@@ -241,7 +241,7 @@ public class Filesystem extends Controller {
                 f_obj.setOwner(user.getId());
                 f_obj.setParent(getCWD());
 
-                if(Account.inkreaseStorage(user, (int)test.length(), true)) {
+                if(Account.inkreaseUsed(user, (int) test.length(), true)) {
                     Ebean.save(f_obj);
                     logger.debug("Filesystem: Successful fileupload of "+fileName+" for user "+user.getEmail());
                     flash("success", "File uploaded");
@@ -352,6 +352,61 @@ public class Filesystem extends Controller {
         }
         //hier nochmal schauen ob der Ordner weg ist. Wenn ja wars erfolgreich sonst false
         return !file.exists();
+    }
+
+    public static Result deleteFile(Long id) {
+        File file = getFile(id);
+        User user = Account.getCurrentUser();
+
+        //prüfen ob es den Benutzer überhaupt gibt
+        if(user == null) {
+            Logger.debug("Filesystem: Delete: User not found");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        //Prüfen ob die Datei überhaupt existiert
+        if (file == null) {
+            Logger.debug("Filesystem: Delete: File not found");
+            flash("error", Messages.get("filesystem.delete.filenotfound"));
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        //Überprüfen ob die gewünschte Datei ein Ordner ist. Das sollte aber normalerweise nie der Fall sein
+        if (file.getFiletype() == FILETYPE_FOLDER) {
+            Logger.debug("Filesystem: Delete: Cannot delete file becaus it's a folder");
+            flash("error", Messages.get("filesystem.delete.fileisafolder"));
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        //wenn hier angelangt, können wir die Datei herunterladen
+        String sub = "";
+        File f = file.getParent();
+        if (f != null) {
+            sub = f.id.toString()+"/";
+        }
+
+        //wenn das alles zutrifft laden wir die Datei im Dateisystem
+        java.io.File real_file = new java.io.File(ROOT_FOLDER, user.getId()+"/"+sub+file.getFilename());
+
+        //Prüfen ob die Datei überhaupt existiert
+        if (!real_file.exists()) {
+            Logger.debug("Filesystem: Delete: Real file not found");
+            flash("error", Messages.get("filesystem.delete.filenotfound"));
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        //jetzt können wir die Datei sowohl aus der Datenbank als auch auf der Festplatte löschen
+        if(real_file.delete()) {
+            Account.dekreaseUsed(user, (int)file.getSize());
+            Ebean.delete(file);
+            Logger.debug("Filesystem: Delete: File "+file.getFilename()+" successful removes");
+            flash("success", Messages.get("filesystem.delete.success", file.getFilename()));
+            return redirect(controllers.routes.Filesystem.index());
+        };
+
+        Logger.debug("Filesystem: Delete: Unknown error occured");
+        flash("error", Messages.get("filesystem.delete.unknownerror"));
+        return redirect(controllers.routes.Filesystem.index());
     }
 
     public static WebSocket<String> filesWS() {

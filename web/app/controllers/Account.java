@@ -329,11 +329,24 @@ public class Account extends Controller {
         return (User)user;
     }
 
-    public static boolean setStorage(User user, Integer ammount) {
-        return inkreaseStorage(user, ammount, false);
+    public static boolean dekreaseUsed(User user, Integer ammount) {
+        if (user == null) {
+            Logger.debug("User not found");
+            return false;
+        }
+
+        ammount = user.getUsed()-ammount;
+
+        if (ammount <= 0) {
+            ammount = 0;
+        }
+
+        user.setUsed(ammount);
+
+        return updateUser(user);
     }
 
-    public static boolean inkreaseStorage(User user, Integer ammount, boolean inkrement) {
+    public static boolean inkreaseUsed(User user, Integer ammount, boolean inkrement) {
 
         if (user == null) {
             Logger.debug("User not found");

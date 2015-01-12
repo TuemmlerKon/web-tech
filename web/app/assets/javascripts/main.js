@@ -34,7 +34,7 @@ function refresh(selector, data_source) {
                value += '<td><i class="fa fa-file"></i> '+bytesToSize(d['size'])+'</td>';
             }
             value += '<td>'+d['service']+'</td>';
-            value += '<td><a href="#" title="löschen"><span class="fa fa-remove"></span></a></td>';
+            value += '<td><a href="'+jsRoutes.controllers.Filesystem.deleteFile(d['id']).url+'" title="löschen"><span class="fa fa-remove"></span></a></td>';
 
             value += '</tr>';
             body.append(value);
@@ -126,6 +126,9 @@ $(function() {
 
    //Initiales laden der Tabellen
    refresh(".table.filesystem tbody", jsRoutes.controllers.Filesystem.jsonFilesList().url);
+
+   var info = $('#storage-info');
+   info.html("Du verbrauchst aktuell <strong>"+bytesToSize(info.attr('data-used'))+' (ca. '+info.attr('data-percent')+'%)</strong> von deinen verfügbaren <strong>'+bytesToSize(info.attr('data-available'))+'</strong>');
 
 });
 

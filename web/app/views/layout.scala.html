@@ -15,7 +15,8 @@
         @helper.javascriptRouter("jsRoutes")(
             routes.javascript.Filesystem.cwd,
             routes.javascript.Filesystem.download,
-            routes.javascript.Filesystem.jsonFilesList
+            routes.javascript.Filesystem.jsonFilesList,
+            routes.javascript.Filesystem.deleteFile
         )
         <script type='text/javascript' src='@routes.Assets.at("javascripts/main.js")'></script>
     </head>
