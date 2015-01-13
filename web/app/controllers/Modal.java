@@ -29,4 +29,9 @@ public class Modal extends Controller {
         return ok(result);
     }
 
+    public static Result newNews() {
+        ObjectNode result = Json.newObject();
+        result.put("body", views.html.modal.newnews.render().toString());
+        return ok(result);
+    }
 }

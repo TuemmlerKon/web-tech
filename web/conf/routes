@@ -21,11 +21,18 @@ GET         /cwd/:folder                  controllers.Filesystem.cwd(folder: Lon
 GET         /download/:file               controllers.Filesystem.download(file: Long)
 POST        /ordner/neu                   controllers.Filesystem.newFolder()
 POST        /datei/neu                    controllers.Filesystem.newFile()
+#Routen für die Modalfenster
 GET         /modal/neuerordner            controllers.Modal.newFolder()
 GET         /modal/neuedatei              controllers.Modal.newFile()
 GET         /modal/accountloeschen        controllers.Modal.rmAccount()
+GET         /modal/news/neu               controllers.Modal.newNews()
+#News
+GET         /news                         controllers.News.index()
+POST        /news/neu                     controllers.News.addPost()
+GET         /news/loeschen/:id            controllers.News.rm(id: Long)
 #JSON-Antowrtende Aktions
 GET         /json/files                   controllers.Filesystem.jsonFilesList()
+GET         /json/news                    controllers.News.jsonNewsList()
 #Websockets
 GET         /news/updates                 controllers.News.newsWS()
 GET         /files/updates                controllers.Filesystem.filesWS()

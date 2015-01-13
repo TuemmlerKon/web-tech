@@ -1,13 +1,16 @@
 @import play.i18n.Messages
 
-<form class="form-modal" role="form" action="@controllers.routes.Filesystem.newFolder()" method="post">
+<form class="form-modal" role="form" action="@controllers.routes.News.addPost()" method="post">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">@Messages.get("application.general.close")</span></button>
-        <h4 class="modal-title" id="myModalLabel">@Messages.get("filesystem.modal.newfolder.title")</h4>
+        <h4 class="modal-title" id="myModalLabel">@Messages.get("news.modal.add.title")</h4>
     </div>
     <div class="modal-body" id="myModalBody">
         <div class="input-group">
-            <input name="foldername" type="text" class="form-control" placeholder="@Messages.get("filesystem.model.enterfoldername")" required autofocus>
+            <input name="name" type="text" class="form-control" id="textinput" placeholder="@Messages.get("news.modal.add.placeholder.title")" required autofocus>
+        </div>
+        <div class="input-group">
+            <textarea name="text" class="form-control" id="textarea" placeholder="@Messages.get("news.modal.add.placeholder.text")" required></textarea>
         </div>
     </div>
     <div class="modal-footer">

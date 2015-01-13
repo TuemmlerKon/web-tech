@@ -2,8 +2,8 @@
 function pad(n) {return (n<10 ? '0'+n : n);}
 
 function bytesToSize(bytes) {
-   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-   if (bytes == 0) return 'n/a';
+   var sizes = ['Bytes', 'KByte', 'MByte', 'GByte', 'TByte'];
+   if (bytes == 0) return '0 Bytes';
    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
 }
@@ -19,7 +19,7 @@ function refresh(selector, data_source) {
             var d = data[i];
             var value = '<tr>';
 
-            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['filename']+'"></td>';
+            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['id']+'"></td>';
 
             if(d['filetype'] == 'folder') {
                value += '<td class="folder-col"><a href="'+jsRoutes.controllers.Filesystem.cwd(d['id']).url+'">'+d['filename']+'</a></td>';
@@ -46,7 +46,40 @@ function refresh(selector, data_source) {
 
       },
       error : function(data) {
-         //alert("failed");
+         body.html("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Fehler beim Laden der Dateiliste</span></div></td></tr>");
+      }
+   });
+}
+
+function refreshNews(selector, data_source) {
+   var body = $(selector);
+   body.html("");
+   $.ajax({
+      type : 'GET',
+      url : data_source,
+      success : function(data) {
+         for(i=0;i<data.length;i++) {
+            var d = data[i];
+            var value = '<tr>';
+
+            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['id']+'"></td>';
+            value += "<td>"+d['name']+"</td>";
+            value += "<td>"+d['text']+"</td>";
+            var date = new Date(d['date']);
+            value += "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" Uhr</td>"
+            value += '<td><a href="'+jsRoutes.controllers.News.rm(d['id']).url+'" title="\''+d['name']+'\' löschen"><span class="fa fa-remove"></span></a></td>';
+
+            value += '</tr>';
+            body.append(value);
+         }
+
+         if(data.length == 0) {
+            body.append("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Keine News vorhanden</span></div></td></tr>");
+         }
+
+      },
+      error : function(data) {
+         body.html("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Fehler beim Laden der News</span></div></td></tr>");
       }
    });
 }
@@ -99,10 +132,15 @@ $(function() {
    var newsSocket = new WS("ws://"+window.location.host+"/news/updates");
    var nreceiveEvent = function(event) {
       var news = JSON.parse(event.data);
-      $('.panel-body.news').html("");
+      var body = $('.panel-body.news');
+      body.html("");
       for(i=0;i<news.length;i++) {
          var date = new Date(news[i]['date']);
-         $('.panel-body.news').append('<p><span class="text-muted">'+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+' Uhr</span>: <strong>'+news[i]['name']+'</strong> '+news[i]['text']+'</p>');
+         body.append('<p><span class="text-muted">Am '+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" um "+pad(date.getHours())+":"+pad(date.getMinutes())+' Uhr von '+news[i]['owner']+'</span>: <strong>['+news[i]['name']+']</strong> '+news[i]['text']+'</p>');
+      }
+      //wenn keine Daten vorhanden sind
+      if(news.length == 0) {
+         body.html('<div class="loader text-muted">Aktuell sind keine Daten vorhanden</div>')
       }
    };
    newsSocket.onmessage = nreceiveEvent;
@@ -110,7 +148,8 @@ $(function() {
    var filesocket = new WS2("ws://"+window.location.host+"/files/updates");
    var freceiveEvent = function(event) {
       var files = JSON.parse(event.data);
-      $('.panel-body.files tbody').html("");
+      var body = $('.panel-body.files tbody');
+      body.html("");
       for(i=0;i<files.length;i++) {
          var date = new Date(files[i]['createDate']);
          var val = "<tr>"+
@@ -119,13 +158,18 @@ $(function() {
                    "<td>"+bytesToSize(files[i]['size'])+"</td>" +
                    "<td>"+files[i]['service']+"</td>" +
                    "</tr>";
-         $('.panel-body.files tbody').append(val);
+         body.append(val);
+      }
+      //wenn keine Daten vorhanden sind
+      if(files.length == 0) {
+         body.html('<tr><td colspan="4" class="loader text-muted">Aktuell sind keine Daten vorhanden</td></tr>')
       }
    };
    filesocket.onmessage = freceiveEvent;
 
    //Initiales laden der Tabellen
    refresh(".table.filesystem tbody", jsRoutes.controllers.Filesystem.jsonFilesList().url);
+   refreshNews(".table.news tbody", jsRoutes.controllers.News.jsonNewsList().url);
 
    var info = $('#storage-info');
    info.html("Du verbrauchst aktuell <strong>"+bytesToSize(info.attr('data-used'))+' (ca. '+info.attr('data-percent')+'%)</strong> von deinen verfügbaren <strong>'+bytesToSize(info.attr('data-available'))+'</strong>');

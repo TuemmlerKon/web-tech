@@ -1,0 +1,41 @@
+@(message: String)
+
+@import play.i18n.Messages
+
+@cwd = {@Filesystem.getCWD}
+
+@buttons(withdelete: Boolean) = {
+    @if(withdelete) {
+        <button type="button" class="btn btn-danger btn-sm pull-right filesystem-action" id="deleteselected" data-url=""><span class="fa fa-remove"></span> @Messages.get("user.files.options.deleteselected")</button>
+    }
+    <button type="button" class="btn btn-success btn-sm pull-right news-action modal-action" data-requesturl="@controllers.routes.Modal.newNews()"><span class="fa fa-plus"></span> @Messages.get("application.news.new")</button>
+    <button type="button" class="btn btn-sm pull-right btn-refresh" id="refresh" onclick="refreshNews('.table.news tbody', '@controllers.routes.News.jsonNewsList()');"><span class="fa fa-refresh"></span> @Messages.get("user.files.options.refresh")</button>
+}
+
+@main(message) {
+    <table class="table news">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="multi-checkbox master"></th>
+                    <th>@Messages.get("application.news.name")</th>
+                    <th>@Messages.get("application.news.text")</th>
+                    <th>@Messages.get("application.news.date")</th>
+                    <th>@Messages.get("application.news.actions")</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                    @buttons(true)
+                    </td>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr>
+                    <td colspan="5" class="loader">
+                        <img src="@routes.Assets.at("ajax-loader.gif")" title="Loading" alt="Loading">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+}
