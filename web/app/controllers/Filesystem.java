@@ -4,8 +4,6 @@ import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 import com.avaje.ebean.Ebean;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import models.File;
 import models.FileSocket;
 import models.User;
@@ -21,11 +19,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.WebSocket;
 import scala.concurrent.duration.Duration;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Filesystem extends Controller {
@@ -70,7 +64,6 @@ public class Filesystem extends Controller {
 
         return list;
     }
-
 
     public static Result jsonFilesList() {
         User user = Account.getCurrentUser();
@@ -570,7 +563,7 @@ public class Filesystem extends Controller {
             public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
                 final ActorRef pingActor = Akka.system().actorOf(Props.create(FileSocket.class, in, out, user));
                 final Cancellable cancellable = Akka.system().scheduler().schedule(Duration.create(1, TimeUnit.SECONDS),
-                        Duration.create(20, TimeUnit.SECONDS),
+                        Duration.create(5, TimeUnit.SECONDS),
                         pingActor,
                         "Files",
                         Akka.system().dispatcher(),

@@ -39,10 +39,11 @@ POST        /news/loeschen                  controllers.News.multiRmNews()
 GET         /json/files                     controllers.Filesystem.jsonFilesList()
 GET         /json/news                      controllers.News.jsonNewsList()
 #Websockets
-GET         /news/updates                   controllers.News.newsWS()
-GET         /files/updates                  controllers.Filesystem.filesWS()
+GET         /ws/news                        controllers.News.newsWS()
+GET         /ws/files                       controllers.Filesystem.filesWS()
+GET         /ws/user                        controllers.Account.userWS()
 #Javascript i3ln
-GET         /javascript/messages.js            controllers.jsMessage.get()
+GET         /javascript/messages.js         controllers.jsMessage.get()
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                   controllers.Assets.at(path="/public", file)
 GET         /webjars/*file                  controllers.WebJarAssets.at(file)

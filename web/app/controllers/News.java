@@ -143,7 +143,7 @@ public class News extends Controller {
             public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
                 final ActorRef pingActor = Akka.system().actorOf(Props.create(NewsSocket.class, in, out));
                 final Cancellable cancellable = Akka.system().scheduler().schedule(Duration.create(1, TimeUnit.SECONDS),
-                        Duration.create(15, TimeUnit.SECONDS),
+                        Duration.create(5, TimeUnit.SECONDS),
                         pingActor,
                         "News",
                         Akka.system().dispatcher(),

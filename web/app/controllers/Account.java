@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
 
+import akka.actor.ActorRef;
+import akka.actor.Cancellable;
+import akka.actor.Props;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +18,7 @@ import play.Logger;
 import play.data.DynamicForm;
 import play.db.*;
 import play.data.Form;
+import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -22,8 +26,11 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.TimeUnit;
 
 import play.i18n.Messages;
+import play.mvc.WebSocket;
+import scala.concurrent.duration.Duration;
 import service.Mailer;
 import service.Serializer;
 
@@ -145,6 +152,36 @@ public class Account extends Controller {
 
     public static Result register() {
         return ok(views.html.account.register.render(Messages.get("user.register.head.title"), Form.form(User.class)));
+    }
+
+    public static User getById(Long id) {
+        PreparedStatement prep;
+        try {
+            prep = connection.prepareStatement("SELECT * FROM `user` WHERE `id` = ?;");
+            prep.setLong(1, id);
+            prep.execute();
+            ResultSet rs = prep.getResultSet();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(Long.parseLong(rs.getString("ID")));
+                user.setEmail(rs.getString("email"));
+                user.setPrename(rs.getString("prename"));
+                user.setSurname(rs.getString("surname"));
+                user.setRoles(rs.getString("roles"));
+                user.setStorage(rs.getInt("storage"));
+                user.setUsed(rs.getInt("storage_used"));
+                user.setCreatedate(DateTime.parse(rs.getTimestamp("createdate").toLocalDateTime().toString()));
+
+                return user;
+
+            }
+
+            return null;
+
+        } catch(SQLException e) {
+            logger.error(e.getMessage());
+            return null;
+        }
     }
 
     public static Result rm() {
@@ -452,28 +489,26 @@ public class Account extends Controller {
         return null;
     }
 
-    public static String getBarClass() {
-        String cssClass = "";
-        int percent = getPercent();
-        if (percent <= 80) cssClass = "progress-bar-success";
-        if (percent > 80) cssClass = "progress-bar-warning";
-        if (percent > 95) cssClass = "progress-bar-danger";
+    public static WebSocket<String> userWS() {
 
-        return cssClass;
-    }
-
-    public static int getPercent() {
         User user = getCurrentUser();
-        Integer percent = 0;
 
-        if(user.getUsed() > 0) {
-            percent = user.getUsed()/(user.getStorage()/100);
-        } else {
-            percent = 0;
-        }
+        return new WebSocket<String>() {
+            public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
+                final ActorRef pingActor = Akka.system().actorOf(Props.create(UserSocket.class, in, out, user.getId()));
+                final Cancellable cancellable = Akka.system().scheduler().schedule(Duration.create(1, TimeUnit.SECONDS),
+                        Duration.create(5, TimeUnit.SECONDS),
+                        pingActor,
+                        "User",
+                        Akka.system().dispatcher(),
+                        null
+                );
 
-        Logger.debug("Storage: "+user.getStorage()+" Used: "+user.getUsed());
+                in.onClose(() -> {
+                    cancellable.cancel();
+                });
+            }
 
-        return percent;
+        };
     }
 }
