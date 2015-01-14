@@ -1,4 +1,4 @@
-@(message: String, files: List[File])
+@(message: String, files: List[File], folders: List[File])
 
 @import play.i18n.Messages
 
@@ -18,8 +18,8 @@
         <ol class="breadcrumb">
             <li class="text-muted"><span class="fa fa-folder"></span></li>
             <li class="text-muted"><a href="@controllers.routes.Filesystem.cwd(0)">Home</a></li>
-            @if(cwd!=null) {
-            <li><a href="#">@cwd.toString()</a></li>
+            @for(f <- folders) {
+                <li class="text-muted"><a href="@controllers.routes.Filesystem.cwd(f.getId)">@f.getFilename</a></li>
             }
         </ol>
         <table class="table filesystem">

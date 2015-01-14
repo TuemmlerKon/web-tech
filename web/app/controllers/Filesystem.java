@@ -52,9 +52,25 @@ public class Filesystem extends Controller {
         }
 
         List<File> list = File.find.where().eq("owner", user.getId().toString()).eq("parent_index", cwd).findList();
+        List<File> folders = getFolderTree(getCWD());
 
-        return ok(views.html.filesystem.index.render(Messages.get("application.general.myfiles"), list));
+        return ok(views.html.filesystem.index.render(Messages.get("application.general.myfiles"), list, folders));
     }
+
+    private static List<File> getFolderTree(File folder) {
+
+        List<File> list = new ArrayList<>();
+        if (folder != null) {
+            if (folder.getParent() != null) {
+                list.addAll(getFolderTree(folder.getParent()));
+            }
+
+            list.add(folder);
+        }
+
+        return list;
+    }
+
 
     public static Result jsonFilesList() {
         User user = Account.getCurrentUser();
