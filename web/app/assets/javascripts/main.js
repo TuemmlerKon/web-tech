@@ -19,7 +19,7 @@ function refresh(selector, data_source) {
             var d = data[i];
             var value = '<tr>';
 
-            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['id']+'"></td>';
+            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['id']+'" data-text="'+d['filename']+'"></td>';
 
             if(d['filetype'] == 'folder') {
                value += '<td class="folder-col"><a href="'+jsRoutes.controllers.Filesystem.cwd(d['id']).url+'">'+d['filename']+'</a></td>';
@@ -33,8 +33,16 @@ function refresh(selector, data_source) {
             } else {
                value += '<td><i class="fa fa-file"></i> '+bytesToSize(d['size'])+'</td>';
             }
+
             value += '<td>'+d['service']+'</td>';
-            value += '<td><a href="'+jsRoutes.controllers.Filesystem.deleteFile(d['id']).url+'" title="löschen"><span class="fa fa-remove"></span></a></td>';
+            //Prüfen ob wir einen Ordner oder eine Datei vor uns haben
+            if(d['filetype'] == 'folder') {
+               value += '<td><a href="'+jsRoutes.controllers.Filesystem.deleteFolder(d['id']).url+'" title="löschen"><span class="fa fa-remove"></span></a></td>';
+            } else {
+               value += '<td><a href="'+jsRoutes.controllers.Filesystem.deleteFile(d['id']).url+'" title="löschen"><span class="fa fa-remove"></span></a></td>';
+            }
+
+
 
             value += '</tr>';
             body.append(value);
@@ -62,7 +70,7 @@ function refreshNews(selector, data_source) {
             var d = data[i];
             var value = '<tr>';
 
-            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['id']+'"></td>';
+            value += '<td><input type="checkbox" class="multi-checkbox" data-value="'+d['id']+'" data-text="'+d['name']+'"></td>';
             value += "<td>"+d['name']+"</td>";
             value += "<td>"+d['text']+"</td>";
             var date = new Date(d['date']);
@@ -93,18 +101,48 @@ $(function() {
       });
    });
 
+   $('#deleteselected').on('click', function() {
+      var rmbutton = $(this);
+      var str_files = "";
+      var str_hidden = "";
+      var ids = new Array();
+      var buttons = $('input[type=checkbox].multi-checkbox:not(.master):checked');
+
+      buttons.each(function() {
+         str_files  += '<li>'+$(this).attr('data-text')+'</li>';
+         str_hidden += '<input type="hidden" name="ids[]" value="'+$(this).attr("data-value")+'">';
+      });
+
+      $.ajax({
+         type : 'GET',
+         url : rmbutton.attr('data-requesturl'),
+         success : function(data) {
+
+            if(str_files == "") {
+               str_files = "<strong>Keine Einträge zum Löschen ausgewählt!</strong>";
+            } else {
+               str_files = "<ul>"+str_files+"</ul>";
+            }
+
+            var val =
+            $(".modal-content").html(data.replace("%PLACEHOLDER_FOR_FILES%", str_files)
+                                                 .replace("%PLACEHOLDER_FOR_HIDDEN_INPUTS%", str_hidden)
+                                                 .replace("%PLACEHOLDER_RM_ACTIONURL%", rmbutton.attr('data-deleteurl')));
+            $('#myModal').modal();
+         }
+      });
+
+   });
+
    $('.modal-action').on('click', function() {
       $.ajax({
          type : 'GET',
          url : $(this).attr('data-requesturl'),
          success : function(data) {
-            $(".modal-content").html(data['body']);
-         },
-         error : function(data) {
-            alert("failed");
+            $(".modal-content").html(data);
+            $('#myModal').modal();
          }
       });
-      $('#myModal').modal();
    });
 
    $('.input-group.password .glyphicon-eye-open').on('click', function () {

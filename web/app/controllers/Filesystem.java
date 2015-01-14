@@ -5,6 +5,7 @@ import akka.actor.Cancellable;
 import akka.actor.Props;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import models.File;
 import models.FileSocket;
 import models.User;
@@ -21,8 +22,10 @@ import play.mvc.Result;
 import play.mvc.WebSocket;
 import scala.concurrent.duration.Duration;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class Filesystem extends Controller {
@@ -372,34 +375,14 @@ public class Filesystem extends Controller {
         }
 
         //Überprüfen ob die gewünschte Datei ein Ordner ist. Das sollte aber normalerweise nie der Fall sein
-        if (file.getFiletype() == FILETYPE_FOLDER) {
+        if (file.getFiletype().equals(FILETYPE_FOLDER)) {
             Logger.debug("Filesystem: Delete: Cannot delete file becaus it's a folder");
             flash("error", Messages.get("filesystem.delete.fileisafolder"));
             return redirect(controllers.routes.Filesystem.index());
         }
 
-        //wenn hier angelangt, können wir die Datei herunterladen
-        String sub = "";
-        File f = file.getParent();
-        if (f != null) {
-            sub = f.id.toString()+"/";
-        }
-
-        //wenn das alles zutrifft laden wir die Datei im Dateisystem
-        java.io.File real_file = new java.io.File(ROOT_FOLDER, user.getId()+"/"+sub+file.getFilename());
-
-        //Prüfen ob die Datei überhaupt existiert
-        if (!real_file.exists()) {
-            Logger.debug("Filesystem: Delete: Real file not found");
-            flash("error", Messages.get("filesystem.delete.filenotfound"));
-            return redirect(controllers.routes.Filesystem.index());
-        }
-
         //jetzt können wir die Datei sowohl aus der Datenbank als auch auf der Festplatte löschen
-        if(real_file.delete()) {
-            Account.dekreaseUsed(user, (int)file.getSize());
-            Ebean.delete(file);
-            Logger.debug("Filesystem: Delete: File "+file.getFilename()+" successful removes");
+        if(doFileDelete(user, file)) {
             flash("success", Messages.get("filesystem.delete.success", file.getFilename()));
             return redirect(controllers.routes.Filesystem.index());
         };
@@ -408,6 +391,160 @@ public class Filesystem extends Controller {
         flash("error", Messages.get("filesystem.delete.unknownerror"));
         return redirect(controllers.routes.Filesystem.index());
     }
+
+    public static Result deleteFolder(Long id) {
+        File file = getFolder(id);
+        User user = Account.getCurrentUser();
+
+        //prüfen ob es den Benutzer überhaupt gibt
+        if(user == null) {
+            Logger.debug("Filesystem: deleteFolder(): User not found");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        //Prüfen ob die Datei überhaupt existiert
+        if (file == null) {
+            Logger.debug("Filesystem: deleteFolder(): File not found id: "+id);
+            flash("error", Messages.get("filesystem.delete.foldernotfound"));
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        //Überprüfen ob die gewünschte Datei ein Ordner ist. Das sollte aber normalerweise nie der Fall sein
+        if (file.getFiletype().equals(FILETYPE_FILE)) {
+            Logger.debug("Filesystem: deleteFolder(): Cannot delete folder because it's a file");
+            flash("error", Messages.get("filesystem.delete.folderisafile"));
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        //schauen ob es Elemente gibt die diesem Ordner untergeordnet sind
+        List<models.File> found = File.find.where().eq("parent_index", file.getId()).findList();
+
+        if(!found.isEmpty()) {
+            Logger.debug("Filesystem: doFolderDelete(): Folder not empty");
+            flash("error", Messages.get("filesystem.delete.foldernotempty", file.getFilename()));
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        //jetzt können wir den Ordner sowohl aus der Datenbank als auch auf der Festplatte löschen
+        if(doFolderDelete(user, file)) {
+            flash("success", Messages.get("filesystem.delete.folder.success", file.getFilename()));
+            return redirect(controllers.routes.Filesystem.index());
+        };
+
+        Logger.debug("Filesystem: deleteFolder(): Unknown error occured");
+        flash("error", Messages.get("filesystem.delete.unknownerror"));
+        return redirect(controllers.routes.Filesystem.index());
+    }
+
+    private static boolean doFolderDelete(User user, File folder) {
+        //wenn das alles passt laden wir den Ordner im Dateisystem
+        java.io.File real_folder = new java.io.File(ROOT_FOLDER, user.getId()+"/"+folder.getId());
+        Logger.debug("Folder: "+ folder.getFilename());
+        //Prüfen ob der Ordner überhaupt existiert
+        if (!real_folder.exists()) {
+            Logger.debug("Filesystem: doFolderDelete(): Real folder not found");
+            return false;
+        }
+        //jetzt müssen wir rekursiv alle Dateien und Ordner suchen
+        //ToDo: Rekursives löschen von Ordnern
+
+        //den aktuellen Ordner hauen wir auch noch weg
+        Ebean.delete(folder);
+        //jetzt löschen wir den Ordner mit all seinen Unterordnern
+        FileUtils.deleteRecursive(ROOT_FOLDER+"/"+user.getId().toString()+"/"+folder.getId().toString(), true);
+
+        Logger.debug("Filesystem: doFolderDelete(): Folder "+folder.getFilename()+" successful removed");
+        return true;
+    }
+
+    private static boolean doFileDelete(User user, File file) {
+        //wenn hier angelangt bauen wir uns den Unterordner für den Pfad
+        String sub = "";
+        File f = file.getParent();
+        if (f != null) {
+            sub = f.id.toString()+"/";
+        }
+
+        //wenn das alles passt laden wir die Datei im Dateisystem
+        java.io.File real_file = new java.io.File(ROOT_FOLDER, user.getId()+"/"+sub+file.getFilename());
+
+        //Prüfen ob die Datei überhaupt existiert
+        if (!real_file.exists()) {
+            Logger.debug("Filesystem: Delete: Real file not found");
+            return false;
+        }
+
+        //jetzt können wir die Datei sowohl aus der Datenbank als auch auf der Festplatte löschen
+        if(real_file.delete()) {
+            Account.dekreaseUsed(user, (int)file.getSize());
+            Ebean.delete(file);
+            Logger.debug("Filesystem: Delete: File "+file.getFilename()+" successful removed");
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Result multiRm() {
+
+        User user = Account.getCurrentUser();
+
+        //prüfen ob es den Benutzer überhaupt gibt
+        if(user == null) {
+            Logger.debug("Filesystem: multiRm(): User not found");
+            return redirect(controllers.routes.Account.login());
+        }
+
+        DynamicForm f = play.data.Form.form().bindFromRequest();
+        Map<String, String> data = f.data();
+
+        List<models.File> list = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String val = entry.getValue();
+            if (!val.isEmpty() && Long.parseLong(val) != 0) {
+                models.File file = models.File.find.byId(Long.parseLong(val));
+                if(file != null) {
+                    list.add(file);
+                }
+            }
+        }
+
+        if (list.isEmpty()) {
+            //Wenn keine Daten abgesendet wurden oder es einen Fehler gab und nichts ankam
+            flash("error", Messages.get("filesystem.multirm.nofiles"));
+            logger.debug("News: multiRm(): Invalid form data");
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        boolean hasError = false;
+
+        //hier kommen wir an, wenn es Daten gab
+        for (models.File entry : list) {
+            if(entry.getFiletype().equals(FILETYPE_FOLDER)) {
+                if(!doFolderDelete(user, entry)) {
+                    hasError = true;
+                }
+            } else if(entry.getFiletype().equals(FILETYPE_FILE)) {
+                if (!doFileDelete(user, entry)) {
+                    hasError = true;
+                }
+            }
+        }
+        //Prüfen ob ein Fehler aufgetreten ist
+        if(!hasError) {
+            //wenn kein Fehler auftrat
+            flash("success", Messages.get("filesystem.multirm.success", list.size()));
+            logger.debug("Filesysten: multiRmFiles(): Successful removed "+list.size()+" entries");
+        } else {
+            //Wenn ein Fehler auftrat das entsprechend wiedergeben
+            flash("error", Messages.get("filesystem.multirm.erroroccured"));
+            logger.debug("Filesysten: multiRmFiles(): Error while deleting multiple files");
+        }
+        //in jedem Fall geht es wieder zur Dateiliste zurück
+        return redirect(controllers.routes.Filesystem.index());
+    }
+
 
     public static WebSocket<String> filesWS() {
 

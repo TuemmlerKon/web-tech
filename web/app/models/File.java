@@ -39,6 +39,10 @@ public class File extends Model {
             Long.class, File.class
     );
 
+    public Long getId() {
+        return id;
+    }
+
     public String toString() {
         return filename;
     }

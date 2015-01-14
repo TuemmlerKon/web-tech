@@ -1,0 +1,17 @@
+@import play.i18n.Messages
+
+<form class="form-modal" role="form" action="%PLACEHOLDER_RM_ACTIONURL%" method="post">
+    %PLACEHOLDER_FOR_HIDDEN_INPUTS%
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">@Messages.get("application.general.close")</span></button>
+        <h4 class="modal-title" id="myModalLabel">Einträge löschen?</h4>
+    </div>
+    <div class="modal-body" id="myModalBody">
+        <p>@Messages.get("application.general.rmentries")</p>
+        %PLACEHOLDER_FOR_FILES%
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("application.general.abort")</button>
+        <button type="submit" class="btn btn-danger btn-submit">@Messages.get("application.general.remove")</button>
+    </div>
+</form>

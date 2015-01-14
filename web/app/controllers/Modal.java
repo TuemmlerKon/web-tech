@@ -12,26 +12,22 @@ public class Modal extends Controller {
     public static Logger.ALogger logger = Logger.of("application.controller.account");
 
     public static Result newFolder() {
-        ObjectNode result = Json.newObject();
-        result.put("body", views.html.modal.newfolder.render().toString());
-        return ok(result);
+        return ok(views.html.modal.newfolder.render());
     }
 
     public static Result newFile() {
-        ObjectNode result = Json.newObject();
-        result.put("body", views.html.modal.newfile.render().toString());
-        return ok(result);
+        return ok(views.html.modal.newfile.render());
     }
 
     public static Result rmAccount() {
-        ObjectNode result = Json.newObject();
-        result.put("body", views.html.modal.rmaccount.render().toString());
-        return ok(result);
+        return ok(views.html.modal.rmaccount.render());
     }
 
     public static Result newNews() {
-        ObjectNode result = Json.newObject();
-        result.put("body", views.html.modal.newnews.render().toString());
-        return ok(result);
+        return ok(views.html.modal.newnews.render());
+    }
+
+    public static Result multiRm() {
+        return ok(views.html.modal.multirm.render());
     }
 }

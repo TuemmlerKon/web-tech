@@ -19,9 +19,13 @@ import play.libs.F;
 import play.mvc.Controller;
 import play.mvc.Result;
 import scala.concurrent.duration.Duration;
+import scala.util.parsing.json.JSONObject;
+import scala.util.parsing.json.JSONObject$;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -71,6 +75,40 @@ public class News extends Controller {
         //Nachricht dass alles gepasst hat
         flash("success", Messages.get("news.add.successful", news.getName()));
         logger.debug("News: add(): \""+news.getName()+"\" successful added");
+        return redirect(controllers.routes.News.index());
+    }
+
+    public static Result multiRmNews() {
+
+        DynamicForm f = play.data.Form.form().bindFromRequest();
+        Map<String, String> data = f.data();
+
+        List<models.News> list = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String val = entry.getValue();
+            if (!val.isEmpty() && Long.parseLong(val) != 0) {
+                models.News news = models.News.find.byId(Long.parseLong(val));
+                if(news != null) {
+                    list.add(news);
+                }
+            }
+        }
+
+        if (list.isEmpty()) {
+            //Wenn keine Daten abgesendet wurden oder es einen Fehler gab und nichts ankam
+            flash("error", Messages.get("news.multirm.nonews"));
+            logger.debug("News: multiRmNews(): Invalid form data");
+            return redirect(controllers.routes.News.index());
+        }
+
+        //hier kommen wir an, wenn es Daten gab
+        for (models.News entry : list) {
+            Ebean.delete(entry);
+        }
+
+        flash("success", Messages.get("news.multirm.success", list.size()));
+        logger.debug("News: multiRmNews(): Successful removed "+list.size()+" entries");
         return redirect(controllers.routes.News.index());
     }
 

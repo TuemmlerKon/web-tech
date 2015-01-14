@@ -6,7 +6,7 @@
 
 @buttons(withdelete: Boolean) = {
     @if(withdelete) {
-        <button type="button" class="btn btn-danger btn-sm pull-right filesystem-action" id="deleteselected" data-url=""><span class="fa fa-remove"></span> @Messages.get("user.files.options.deleteselected")</button>
+        <button type="button" class="btn btn-danger btn-sm pull-right filesystem-action" id="deleteselected" data-requesturl="@controllers.routes.Modal.multiRm()" data-deleteurl="@controllers.routes.News.multiRmNews()"><span class="fa fa-remove"></span> @Messages.get("user.files.options.deleteselected")</button>
     }
     <button type="button" class="btn btn-success btn-sm pull-right news-action modal-action" data-requesturl="@controllers.routes.Modal.newNews()"><span class="fa fa-plus"></span> @Messages.get("application.news.new")</button>
     <button type="button" class="btn btn-sm pull-right btn-refresh" id="refresh" onclick="refreshNews('.table.news tbody', '@controllers.routes.News.jsonNewsList()');"><span class="fa fa-refresh"></span> @Messages.get("user.files.options.refresh")</button>
