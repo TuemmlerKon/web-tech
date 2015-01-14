@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "2.1.1",
   "org.webjars" % "bootstrap" % "3.1.1-2",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.1",
+  "org.julienrf" %% "play-jsmessages" % "1.6.2",
   jdbc,
   javaEbean,
   cache,

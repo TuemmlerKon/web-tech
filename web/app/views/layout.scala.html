@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")">
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+        <script type='text/javascript' src='@routes.jsMessage.get()'></script>
         @helper.javascriptRouter("jsRoutes")(
             routes.javascript.Filesystem.cwd,
             routes.javascript.Filesystem.download,

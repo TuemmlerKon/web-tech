@@ -27,7 +27,7 @@ function refresh(selector, data_source) {
                value += '<td class="file-col"><a href="'+jsRoutes.controllers.Filesystem.download(d['id']).url+'">'+d['filename']+'</a></td>';
             }
             var date = new Date(d['createDate']);
-            value += "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" Uhr</td>"
+            value += "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" "+Messages("user.files.clock")+"</td>"
             if(d['filetype'] == 'folder') {
                value += '<td><i class="fa fa-folder"></i></td>';
             } else {
@@ -49,12 +49,12 @@ function refresh(selector, data_source) {
          }
 
          if(data.length == 0) {
-            body.append("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Keine Dateien vorhanden</span></div></td></tr>");
+            body.append("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">"+Messages("application.dashboard.nofilesavailable")+"</span></div></td></tr>");
          }
 
       },
       error : function(data) {
-         body.html("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Fehler beim Laden der Dateiliste</span></div></td></tr>");
+         body.html("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">"+Messages("application.dashboard.fileserror")+"</span></div></td></tr>");
       }
    });
 }
@@ -74,7 +74,7 @@ function refreshNews(selector, data_source) {
             value += "<td>"+d['name']+"</td>";
             value += "<td>"+d['text']+"</td>";
             var date = new Date(d['date']);
-            value += "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" Uhr</td>"
+            value += "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" "+Messages("user.files.clock")+"</td>"
             value += '<td><a href="'+jsRoutes.controllers.News.rm(d['id']).url+'" title="\''+d['name']+'\' löschen"><span class="fa fa-remove"></span></a></td>';
 
             value += '</tr>';
@@ -82,12 +82,12 @@ function refreshNews(selector, data_source) {
          }
 
          if(data.length == 0) {
-            body.append("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Keine News vorhanden</span></div></td></tr>");
+            body.append("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">"+Messages("application.dashboard.nonewsavailable")+"</span></div></td></tr>");
          }
 
       },
       error : function(data) {
-         body.html("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">Fehler beim Laden der News</span></div></td></tr>");
+         body.html("<tr><td colspan=\"6\"><div class='loader'><span class=\"text-muted\">"+Messages("application.dashboard.newserror")+"</span></div></td></tr>");
       }
    });
 }
@@ -119,7 +119,7 @@ $(function() {
          success : function(data) {
 
             if(str_files == "") {
-               str_files = "<strong>Keine Einträge zum Löschen ausgewählt!</strong>";
+               str_files = Messages("application.multirm.noentriesselected");
             } else {
                str_files = "<ul>"+str_files+"</ul>";
             }
@@ -174,11 +174,13 @@ $(function() {
       body.html("");
       for(i=0;i<news.length;i++) {
          var date = new Date(news[i]['date']);
-         body.append('<p><span class="text-muted">Am '+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" um "+pad(date.getHours())+":"+pad(date.getMinutes())+' Uhr von '+news[i]['owner']+'</span>: <strong>['+news[i]['name']+']</strong> '+news[i]['text']+'</p>');
+         var date_str = pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear();
+         var time_str = pad(date.getHours())+":"+pad(date.getMinutes());
+         body.append('<p>'+Messages("application.dashboard.newstext", date_str, time_str, news[i]['owner'], news[i]['name'], news[i]['text'])+'</p>');
       }
       //wenn keine Daten vorhanden sind
       if(news.length == 0) {
-         body.html('<div class="loader text-muted">Aktuell sind keine Daten vorhanden</div>')
+         body.html('<div class="loader text-muted">Messages("application.dashboard.nonewsavailable")</div>')
       }
    };
    newsSocket.onmessage = nreceiveEvent;
@@ -190,9 +192,10 @@ $(function() {
       body.html("");
       for(i=0;i<files.length;i++) {
          var date = new Date(files[i]['createDate']);
+         var date_str = pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes());
          var val = "<tr>"+
-                   "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" Uhr</td>" +
-                   "<td>"+files[i]['filename']+"</td>" +
+                   "<td>"+date_str+" "+Messages("user.files.clock")+"</td>" +
+                   "<td><i class=\"fa fa-file\"></i> "+files[i]['filename']+"</td>" +
                    "<td>"+bytesToSize(files[i]['size'])+"</td>" +
                    "<td>"+files[i]['service']+"</td>" +
                    "</tr>";
@@ -200,7 +203,7 @@ $(function() {
       }
       //wenn keine Daten vorhanden sind
       if(files.length == 0) {
-         body.html('<tr><td colspan="4" class="loader text-muted">Aktuell sind keine Daten vorhanden</td></tr>')
+         body.html('<tr><td colspan="4" class="loader text-muted">Messages("application.dashboard.nofilesavailable")</td></tr>')
       }
    };
    filesocket.onmessage = freceiveEvent;
@@ -210,7 +213,7 @@ $(function() {
    refreshNews(".table.news tbody", jsRoutes.controllers.News.jsonNewsList().url);
 
    var info = $('#storage-info');
-   info.html("Du verbrauchst aktuell <strong>"+bytesToSize(info.attr('data-used'))+' (ca. '+info.attr('data-percent')+'%)</strong> von deinen verfügbaren <strong>'+bytesToSize(info.attr('data-available'))+'</strong>');
+   info.html(Messages("application.dashboard.usage", bytesToSize(info.attr('data-used')), info.attr('data-percent'), bytesToSize(info.attr('data-available'))));
 
 });
 

@@ -115,3 +115,10 @@ news.multirm.nonews=Es wurden keine Neuigkeiten zum löschen ausgewählt
 news.multirm.success=Es wurden erfolgreich {0} Einträge gelöscht
 news.modal.add.placeholder.title=Titel der Neuigkeit
 news.modal.add.placeholder.text=Text für die Neuigkeit
+application.dashboard.usage=Du verbrauchst aktuell <strong> {0} (ca. {1} %)</strong> von deinen verfügbaren <strong>{2}</strong>
+application.dashboard.nonewsavailable=Aktuell sind keine Neuigkeiten vorhanden
+application.dashboard.nofilesavailable=Aktuell gibt es keine Dateien in deiner Cloud
+application.multirm.noentriesselected=<strong>Keine Einträge zum Löschen ausgewählt!</strong>
+application.dashboard.newserror=Fehler beim Laden der News
+application.dashboard.fileserror=Fehler beim Laden der Dateiliste
+application.dashboard.newstext=<span class="text-muted">Am {0} um {1} Uhr von {2}:</span> <strong>[{3}]</strong> {4}
