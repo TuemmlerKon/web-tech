@@ -5,7 +5,7 @@ function bytesToSize(bytes) {
    var sizes = ['Bytes', 'KByte', 'MByte', 'GByte', 'TByte'];
    if (bytes == 0) return '0 Bytes';
    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-   return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+   return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 }
 
 function refresh(selector, data_source) {
