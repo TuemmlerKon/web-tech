@@ -180,7 +180,7 @@ $(function() {
       }
       //wenn keine Daten vorhanden sind
       if(news.length == 0) {
-         body.html('<div class="loader text-muted">Messages("application.dashboard.nonewsavailable")</div>')
+         body.html('<div class="loader text-muted">'+Messages("application.dashboard.nonewsavailable")+'</div>')
       }
    };
    newsSocket.onmessage = nreceiveEvent;
@@ -203,7 +203,7 @@ $(function() {
       }
       //wenn keine Daten vorhanden sind
       if(files.length == 0) {
-         body.html('<tr><td colspan="4" class="loader text-muted">Messages("application.dashboard.nofilesavailable")</td></tr>')
+         body.html('<tr><td colspan="4" class="loader text-muted">'+Messages("application.dashboard.nofilesavailable")+'</td></tr>')
       }
    };
    filesocket.onmessage = freceiveEvent;
