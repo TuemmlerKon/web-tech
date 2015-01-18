@@ -342,7 +342,7 @@ public class Account extends Controller {
                 Config conf = ConfigFactory.load();
                 String data = Messages.get("user.activation.success");
                 if(conf.getBoolean("smtp.enabled")) {
-                    new Mailer("konstantin@tuemmler.org", conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
+                    new Mailer(rs.getString("email"), conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
                 } else {
                     logger.debug("Mailer currently disabled: Could not send activation verification");
                 }
