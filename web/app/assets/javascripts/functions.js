@@ -5,7 +5,7 @@ function bytesToSize(bytes) {
    var sizes = ['Bytes', 'KByte', 'MByte', 'GByte', 'TByte'];
    if (bytes == 0) return '0 Bytes';
    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-   return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+   return (bytes / Math.pow(1024, i)).toFixed(2).replace('.',',') + ' ' + sizes[i];
 }
 
 function refresh(selector, data_source) {
@@ -24,7 +24,12 @@ function refresh(selector, data_source) {
             if(d['filetype'] == 'folder') {
                value += '<td class="folder-col"><a href="'+jsRoutes.controllers.Filesystem.cwd(d['id']).url+'">'+d['filename']+'</a></td>';
             } else {
-               value += '<td class="file-col"><a href="'+jsRoutes.controllers.Filesystem.download(d['id']).url+'">'+d['filename']+'</a></td>';
+               var filename = d['filename'];
+               if(d['key'] != null) {
+                  filename += " <i class=\"fa fa-lock\" title=\""+Messages("filesystem.fileencrypted")+"\"></i>"
+               }
+
+               value += '<td class="file-col"><a href="'+jsRoutes.controllers.Filesystem.download(d['id']).url+'">'+filename+'</a></td>';
             }
             var date = new Date(d['createDate']);
             value += "<td>"+pad(date.getDate())+"."+pad(date.getMonth()+1)+"."+date.getFullYear()+" "+pad(date.getHours())+":"+pad(date.getMinutes())+" "+Messages("user.files.clock")+"</td>"

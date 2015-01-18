@@ -6,6 +6,7 @@ import akka.actor.Props;
 import com.avaje.ebean.Ebean;
 import models.File;
 import models.FileSocket;
+import models.Passphrase;
 import models.User;
 import org.h2.store.fs.FileUtils;
 import play.Logger;
@@ -19,8 +20,13 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.WebSocket;
 import scala.concurrent.duration.Duration;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import service.Security;
 
 public class Filesystem extends Controller {
 
@@ -146,7 +152,25 @@ public class Filesystem extends Controller {
 
         response().setContentType("application/x-download");
         response().setHeader("Content-disposition","attachment; filename=\""+file.getFilename()+"\"");
-        return ok(new java.io.File(ROOT_FOLDER, user.getId() + "/" + sub + file.getFilename()));
+
+        InputStream download;
+        String path = ROOT_FOLDER +"/"+ user.getId() + "/" + sub + file.getFilename();
+
+        try {
+            if (file.getKey() != null) {
+                //wenn die Datei verschlüsselt ist
+                FileInputStream fis = new FileInputStream(path+".aes");
+                download = Security.getDecryptedStream(file.getKey().getPassphrase(), fis);
+            } else {
+                download = new FileInputStream(path);
+            }
+        } catch (Throwable e) {
+            flash("error", Messages.get("filesystem.file.unknownerror"));
+            logger.debug("Filesystem: Downloadfile: Error while encrypting key");
+            return redirect(controllers.routes.Filesystem.index());
+        }
+
+        return ok(download);
     }
 
     public static File getCWD() {
@@ -229,12 +253,16 @@ public class Filesystem extends Controller {
         //laden der Datei vom hochladen
         Http.MultipartFormData body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart data = body.getFile("filename");
+
+        DynamicForm requestData = Form.form().bindFromRequest();
+
         if (data != null) {
             String fileName = data.getFilename();
             //ToDo: Den Contenttype hier auch mit in die Datenbank schreiben. Dann ist der Download einfacher
             //String contentType = data.getContentType();
             java.io.File file = data.getFile();
             java.io.File test = new java.io.File(ROOT_FOLDER, user.getId().toString()+"/"+folderid+fileName);
+            java.io.File enc_file = new java.io.File(ROOT_FOLDER, user.getId().toString()+"/"+folderid+fileName+".aes");
 
             if(test.exists()) {
                 logger.debug("Filesystem: File already exists "+test.getPath());
@@ -254,9 +282,29 @@ public class Filesystem extends Controller {
                 f_obj.setParent(getCWD());
 
                 if(Account.inkreaseUsed(user, (int) test.length(), true)) {
+                    //hier Verschlüsseln wir die Datei, falls das gewünscht ist
+                    String enc = requestData.get("encryption");
+                    if(enc != null && enc.equals("checked")) {
+                        String code = new Account().new generateCode().generate().substring(0, 16);
+                        Passphrase p = new Passphrase();
+                        p.setPassphrase(code);
+
+                        //jetzt die Verschlüsselung durchführen
+                        try {
+                            FileInputStream fis = new FileInputStream(test);
+                            FileOutputStream fos = new FileOutputStream(enc_file);
+                            Security.encrypt(p.getPassphrase(), fis, fos);
+                            Ebean.save(p);
+                            f_obj.setKey(p);
+                            test.delete();
+                        } catch (Throwable e) {
+                            Logger.debug("Filesystem: newFile(): "+e.getMessage());
+                        }
+                    }
+
                     Ebean.save(f_obj);
                     logger.debug("Filesystem: Successful fileupload of "+fileName+" for user "+user.getEmail());
-                    flash("success", "File uploaded");
+                    flash("success", Messages.get("user.filesystem.upload.successful", f_obj.getFilename()));
                 } else {
                     //wenn das Dateilimit erreicht ist, wird die Datei nicht in die Datenbank geschrieben und die Datei selbst gelöscht
                     file.delete();
@@ -474,8 +522,14 @@ public class Filesystem extends Controller {
             sub = f.id.toString()+"/";
         }
 
+        String filename = user.getId()+"/"+sub+file.getFilename();
+
+        if (file.getKey() != null) {
+            filename += ".aes";
+        }
+
         //wenn das alles passt laden wir die Datei im Dateisystem
-        java.io.File real_file = new java.io.File(ROOT_FOLDER, user.getId()+"/"+sub+file.getFilename());
+        java.io.File real_file = new java.io.File(ROOT_FOLDER, filename);
 
         //Prüfen ob die Datei überhaupt existiert
         if (!real_file.exists()) {
@@ -487,6 +541,8 @@ public class Filesystem extends Controller {
         if(real_file.delete()) {
             Account.dekreaseUsed(user, (int)file.getSize());
             Ebean.delete(file);
+            //Falls es einen EncryptionKey gibt löschen wir den hier zuerst
+            if (file.getKey() != null) Ebean.delete(file.getKey());
             Logger.debug("Filesystem: Delete: File "+file.getFilename()+" successful removed");
             return true;
         }

@@ -4,6 +4,7 @@
 
 GET         /                               controllers.Application.index()
 GET         /einstellungen                  controllers.Application.settings()
+POST         /einstellungen/sicherheit       controllers.Account.setDefaultEncryption()
 GET         /agb                            controllers.Application.gtc()
 GET         /impressum                      controllers.Application.imprint()
 GET         /registrierung                  controllers.Account.register()

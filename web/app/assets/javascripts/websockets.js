@@ -66,7 +66,7 @@ $(function() {
          var content = '<div class="progress">' +
                        '<div class="progress-bar '+bar_class+' progress-bar-striped" role="progressbar" aria-valuenow="'+percent+'" aria-valuemin="0" aria-valuemax="100" style="width: '+Math.floor(percent)+'%;">'+percent+'%</div>' +
                        '</div>' +
-                       '<p>'+Messages("application.dashboard.usage", bytesToSize(user['used']), percent, bytesToSize(user['storage']))+'</p>';
+                       '<p>'+Messages("application.dashboard.usage", bytesToSize(user['used']), percent.replace('.',','), bytesToSize(user['storage']))+'</p>';
          bar.html(content);
       }
    };

@@ -21,6 +21,10 @@ public class File extends Model {
     @JoinColumn(name = "parent_index", referencedColumnName = "id")
     public File parent;
 
+    @OneToOne
+    @JoinColumn(name = "key_id", referencedColumnName = "id")
+    public Passphrase passphrase;
+
     public long size;
 
     @Constraints.Required
@@ -105,5 +109,13 @@ public class File extends Model {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Passphrase getKey() {
+        return passphrase;
+    }
+
+    public void setKey(Passphrase passphrase) {
+        this.passphrase = passphrase;
     }
 }

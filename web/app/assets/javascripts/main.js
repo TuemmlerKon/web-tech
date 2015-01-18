@@ -1,5 +1,9 @@
 $(function() {
 
+   $("#default_encryption_set").change(function() {
+      $(this).parent().parent().parent().submit();
+   });
+
    $('input[type=checkbox].multi-checkbox.master').on('click', function() {
       var isChecked = $(this).prop('checked');
       $('input[type=checkbox].multi-checkbox:not(.master)').each(function() {
@@ -38,6 +42,10 @@ $(function() {
          }
       });
 
+   });
+
+   $("#button_upload").on("click", function() {
+      alert($("#upload_file").files[0].size);
    });
 
    $('.modal-action').on('click', function() {

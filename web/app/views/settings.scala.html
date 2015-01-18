@@ -27,21 +27,22 @@
             </form>
         </div>
     </div>
-
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">@Messages.get("user.settings.delete")</h3>
+            <h3 class="panel-title">@Messages.get("user.settings.security")</h3>
         </div>
         <div class="panel-body">
-            <p>Wenn du dein Konto bei uns löschen möchtest, kannst du das tun, indem du auf den Button "Konto jetzt löschen" klickst.
-                Die von uns erstellten Dateien bei deinen Cloud-Anbietern werden dann automatisch gelöscht. Wenn du das nicht möchtest,
-                dann solltest du deine Dateien vorher senden (denke aber an die Verschlüsselung).</p>
-            <p>Bei Fragen sende einfach eine E-Mail an <a href="#">hilfe@@cloudplex.de</a></p>
-            <form class="form-deleteaccount" role="form">
-                <button class="btn btn-sm btn-danger btn-block modal-action" data-requesturl="@controllers.routes.Modal.rmAccount()" type="button"><span class="fa fa-remove"></span> @Messages.get("user.settings.deleteaccount")</button>
+            <form class="form-setencryption" role="form" action="@controllers.routes.Account.setDefaultEncryption()" method="post">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="default_encryption_set" name="default_encryption" value="selected" @if(Account.getCurrentUser.isDefault_encrypt) { checked="checked" }> @Messages.get("user.settings.defaultencryption")@if(Account.getCurrentUser.isDefault_encrypt) { <span class="text-success"> (@Messages.get("user.settings.encryption.activated"))</span> } else { <span class="text-danger"> (@Messages.get("user.settings.encryption.deactivated"))</span> }
+                    </label>
+                </div>
+                <p class="text-info"><i class="fa fa-info"></i> @Messages.get("user.settings.defaultencryption.description")</p>
             </form>
         </div>
     </div>
+
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">@Messages.get("user.settings.cloudaccounts")</h3>
@@ -57,37 +58,79 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td colspan="4">
-                            Aktuell können Dateien nur auf dem lokalen System gespeichert werden. Externe Anbieter folgen in Kürze.
-                        </td>
+                    <tr class="@Account.getCurrentUser.getIndicatorClass">
+                        <td></td>
+                        <td>CloudPlex.de</td>
+                        <td>@Account.getCurrentUser.getEmail <span class="text-success">(@Messages.get("user.settings.systemaccount"))</span></td>
+                        <td>@Account.getCurrentUser.getRemaining %</td>
                     </tr>
-                    <!--
-                    <tr>
-                        <td><input type="checkbox" class="multi-checkbox"></td>
-                        <td>Dropbox</td>
-                        <td>foobar@@gmx.com</td>
-                        <td>30 %</td>
-                    </tr>
-                    <tr>
+                    <tr class="bg-danger text-muted">
                         <td><input type="checkbox" class="multi-checkbox"></td>
                         <td>Google-Drive</td>
-                        <td>google@@gmail.com</td>
-                        <td>65 %</td>
+                        <td>@Messages.get("user.settings.provider.notavailable")</td>
+                        <td>0,00 %</td>
                     </tr>
-                    <tr>
+                    <tr class="bg-danger text-muted">
                         <td><input type="checkbox" class="multi-checkbox"></td>
                         <td>OneDrive</td>
-                        <td>someone@@microsoft.com</td>
-                        <td>10 %</td>
+                        <td>@Messages.get("user.settings.provider.notavailable")</td>
+                        <td>0,00 %</td>
                     </tr>
-                </tbody>-->
+                    <tr class="bg-danger text-muted">
+                        <td><input type="checkbox" class="multi-checkbox"></td>
+                        <td>Dropbox</td>
+                        <td>@Messages.get("user.settings.provider.notavailable")</td>
+                        <td>0,00 %</td>
+                    </tr>
+                    <tr class="bg-danger text-muted">
+                        <td><input type="checkbox" class="multi-checkbox"></td>
+                        <td>Telekom Mediencenter</td>
+                        <td>@Messages.get("user.settings.provider.notavailable")</td>
+                        <td>0,00 %</td>
+                    </tr>
+                    <tr class="bg-danger text-muted">
+                        <td><input type="checkbox" class="multi-checkbox"></td>
+                        <td>JustCloud</td>
+                        <td>@Messages.get("user.settings.provider.notavailable")</td>
+                        <td>0,00 %</td>
+                    </tr>
+                    <tr class="bg-danger text-muted">
+                        <td><input type="checkbox" class="multi-checkbox"></td>
+                        <td>SafeSync Business</td>
+                        <td>@Messages.get("user.settings.provider.notavailable")</td>
+                        <td>0,00 %</td>
+                    </tr>
+                    <tr class="text-danger">
+                        <td colspan="4">
+                            <i class="fa fa-warning"></i> @Messages.get("user.settings.justlocalfilesavailable")
+                        </td>
+                    </tr>
+                    <tr class="text-info">
+                        <td colspan="4">
+                            <i class="fa fa-info"></i> @Messages.get("user.settings.colorinformation")
+                        </td>
+                    </tr>
+                </tbody>
             </table>
-            <!--
+                <!--
             <div class="pull-left"><button class="btn btn-sm btn-danger text-muted"><span class="fa fa-remove"></span> Messages.get("user.settings.cloudaccounts.removeselected")</button></div>
             <div class="pull-right"><button class="btn btn-sm btn-info text-muted"><span class="fa fa-plus"></span> Messages.get("user.settings.cloudaccounts.addaccount")</button></div>
         -->
         </div>
     </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">@Messages.get("user.settings.delete")</h3>
+        </div>
+        <div class="panel-body">
+            <p class="text-danger"><i class="fa fa-warning"></i> @Messages.get("user.settinge.rmaccount.notice")</p>
+            <p>@Messages.get("user.settings.rmaccount.emailinfo") <a href="mailto://hilfe@@cloudplex.de">hilfe@@cloudplex.de</a></p>
+            <form class="form-deleteaccount" role="form">
+                <button class="btn btn-sm btn-danger btn-block modal-action" data-requesturl="@controllers.routes.Modal.rmAccount()" type="button"><span class="fa fa-remove"></span> @Messages.get("user.settings.deleteaccount")</button>
+            </form>
+        </div>
+    </div>
+
 
 }

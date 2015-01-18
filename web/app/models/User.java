@@ -6,6 +6,9 @@ import play.data.validation.Constraints;
 import scala.math.BigInt;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 
 public class User implements Serializable{
@@ -28,6 +31,7 @@ public class User implements Serializable{
     public String roles;
     public Integer storage;
     public Integer used;
+    public boolean default_encrypt = false;
     private boolean invalid;
 
     public Integer getUsed() {
@@ -112,6 +116,35 @@ public class User implements Serializable{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isDefault_encrypt() {
+        return default_encrypt;
+    }
+
+    public void setDefault_encrypt(boolean default_encrypt) {
+        this.default_encrypt = default_encrypt;
+    }
+
+    public String getPercent() {
+        DecimalFormat df=new DecimalFormat("0.00");
+        double d = used / (storage / 100.0);
+        return df.format(d);
+    }
+
+    public String getIndicatorClass() {
+        Long val = Math.round(Double.parseDouble(getRemaining().replace(",",".")));
+        String ret = "";
+        if (val >= 20) ret = "bg-success";
+        if (val < 20 && val >= 5) ret = "bg-warn";
+        if (val < 5) ret = "bg-danger";
+
+        return ret;
+    }
+
+    public String getRemaining() {
+        DecimalFormat df=new DecimalFormat("0.00");
+        return df.format(100.0-Double.parseDouble(getPercent().replace(",",".")));
     }
 
     private boolean rmRole(User user, String role) {

@@ -6,12 +6,18 @@
         <h4 class="modal-title" id="myModalLabel">@Messages.get("filesystem.modal.newfile.title")</h4>
     </div>
     <div class="modal-body" id="myModalBody">
-        <div class="input-group">
-            <input type="file" name="filename" class="form-control" placeholder="@Messages.get("filesystem.model.enterfoldername")" required autofocus>
+        <div class="form-group">
+            <input type="file" name="filename" id="upload_file" placeholder="@Messages.get("filesystem.model.enterfoldername")" required autofocus>
+            <p class="help-block">@Messages.get("filesystem.model.choosefilehelp")</p>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="encryption_set" name="encryption" value="checked" @if(Account.getCurrentUser.isDefault_encrypt) { checked="checked" }> @Messages.get("user.files.encryption")
+            </label>
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">@Messages.get("application.general.abort")</button>
-        <button type="submit" class="btn btn-primary btn-submit">@Messages.get("application.general.upload")</button>
+        <button type="submit" class="btn btn-primary btn-submit" id="button_upload">@Messages.get("application.general.upload")</button>
     </div>
 </form>

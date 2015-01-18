@@ -21,8 +21,10 @@ public class UserSocket extends UntypedActor {
 
     public void onReceive(Object message) {
         if (message.equals("User")) {
-            User user = Account.getById(userid);
-            out.write(Json.toJson(user).toString());
+            if (userid != 0) {
+                User user = Account.getById(userid);
+                out.write(Json.toJson(user).toString());
+            }
         } else {
             unhandled(message);
         }

@@ -20,8 +20,10 @@ public class FileSocket extends UntypedActor {
 
     public void onReceive(Object message) {
         if (message.equals("Files")) {
-            List<File> files = File.find.where().eq("filetype", Filesystem.FILETYPE_FILE).eq("owner",user.getId()).setMaxRows(8).orderBy("create_date desc").findList();
-            out.write(Json.toJson(files).toString());
+            if(user != null) {
+                List<File> files = File.find.where().eq("filetype", Filesystem.FILETYPE_FILE).eq("owner",user.getId()).setMaxRows(8).orderBy("create_date desc").findList();
+                out.write(Json.toJson(files).toString());
+            }
         } else {
             unhandled(message);
         }

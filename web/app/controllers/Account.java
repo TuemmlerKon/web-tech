@@ -5,6 +5,7 @@ import java.sql.*;
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
+import com.avaje.ebean.Ebean;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.*;
@@ -163,6 +164,7 @@ public class Account extends Controller {
                 user.setRoles(rs.getString("roles"));
                 user.setStorage(rs.getInt("storage"));
                 user.setUsed(rs.getInt("storage_used"));
+                user.setDefault_encrypt(rs.getBoolean("default_encrypt"));
                 user.setCreatedate(DateTime.parse(rs.getTimestamp("createdate").toLocalDateTime().toString()));
 
                 return user;
@@ -218,6 +220,35 @@ public class Account extends Controller {
             flash("error", Messages.get("account.rmaccount.error"));
             logger.debug("Account: Invalid data from user");
         }
+
+        return redirect(controllers.routes.Application.settings());
+    }
+
+    public static Result setDefaultEncryption() {
+        DynamicForm requestData = Form.form().bindFromRequest();
+        User user = getCurrentUser();
+        boolean encrypt = false;
+
+        if(requestData == null || requestData.hasErrors()) {
+            flash("error", Messages.get("user.settings.unknownerror"));
+            logger.debug("Change password: Unknown error while setting new value");
+            return redirect(controllers.routes.Application.settings());
+        }
+        //Daten lesen
+        String data = requestData.get("default_encryption");
+
+        if (data == null || !data.equals("selected")) {
+            encrypt = false;
+            flash("success", Messages.get("user.settings.encryption.tofalse"));
+            Logger.debug("Account: setDefaultEncryption(): Updated to false");
+        } else {
+            encrypt = true;
+            flash("success", Messages.get("user.settings.encryption.totrue"));
+            Logger.debug("Account: setDefaultEncryption(): Updated to true");
+        }
+
+        user.setDefault_encrypt(encrypt);
+        Account.updateUser(user);
 
         return redirect(controllers.routes.Application.settings());
     }
@@ -395,7 +426,7 @@ public class Account extends Controller {
         return updateUser(user);
     }
 
-    private final class generateCode {
+    public final class generateCode {
 
         private SecureRandom random = new SecureRandom();
 
@@ -412,14 +443,15 @@ public class Account extends Controller {
 
         PreparedStatement prep;
         try {
-            prep = connection.prepareStatement("UPDATE `user` SET `prename` = ?, `surname` = ?, `email` = ?, `roles` = ?, `storage` = ?, `storage_used` = ? WHERE `user`.`ID` = ?;");
+            prep = connection.prepareStatement("UPDATE `user` SET `prename` = ?, `surname` = ?, `email` = ?, `roles` = ?, `storage` = ?, `storage_used` = ?, `default_encrypt` = ? WHERE `user`.`ID` = ?;");
             prep.setString(1, user.getPrename());
             prep.setString(2, user.getSurname());
             prep.setString(3, user.getEmail());
             prep.setString(4, user.getRoles());
             prep.setInt(5, user.getStorage());
             prep.setInt(6, user.getUsed());
-            prep.setLong(7, user.getId());
+            prep.setBoolean(7, user.isDefault_encrypt());
+            prep.setLong(8, user.getId());
             prep.execute();
             prep.close();
         }
@@ -487,7 +519,7 @@ public class Account extends Controller {
 
         return new WebSocket<String>() {
             public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
-                final ActorRef pingActor = Akka.system().actorOf(Props.create(UserSocket.class, in, out, user.getId()));
+                final ActorRef pingActor = Akka.system().actorOf(Props.create(UserSocket.class, in, out, user == null ? 0 : user.getId()));
                 final Cancellable cancellable = Akka.system().scheduler().schedule(Duration.create(1, TimeUnit.SECONDS),
                         Duration.create(5, TimeUnit.SECONDS),
                         pingActor,
