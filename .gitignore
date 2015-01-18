@@ -18,5 +18,6 @@ logs
 project/project
 project/target
 target
+!sql/*
 tmp
 *.log
