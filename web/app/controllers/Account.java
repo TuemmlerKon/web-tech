@@ -332,6 +332,7 @@ public class Account extends Controller {
             prep.execute();
             ResultSet rs = prep.getResultSet();
             if (rs.next()) {
+                String email = rs.getString("email");
                 //der Aktivierungskey war vorhanden, wir können den Benutzer also aktivieren
                 prep.close();
                 prep = connection.prepareStatement("UPDATE `user` SET `activation` = '' WHERE `activation` = ?;");
@@ -342,7 +343,7 @@ public class Account extends Controller {
                 Config conf = ConfigFactory.load();
                 String data = Messages.get("user.activation.success");
                 if(conf.getBoolean("smtp.enabled")) {
-                    new Mailer(rs.getString("email"), conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
+                    new Mailer(email, conf.getString("smtp.from"), Messages.get("user.activation.email.subject.success"), data).send();
                 } else {
                     logger.debug("Mailer currently disabled: Could not send activation verification");
                 }
