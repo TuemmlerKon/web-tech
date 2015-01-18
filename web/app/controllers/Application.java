@@ -1,7 +1,6 @@
 package controllers;
 
 import models.User;
-import play.api.Routes;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.i18n.Messages;

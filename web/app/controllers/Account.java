@@ -1,15 +1,10 @@
 package controllers;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.*;
-
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 import akka.actor.Props;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.*;
@@ -19,7 +14,6 @@ import play.data.DynamicForm;
 import play.db.*;
 import play.data.Form;
 import play.libs.Akka;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import java.math.BigInteger;
@@ -27,7 +21,6 @@ import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
-
 import play.i18n.Messages;
 import play.mvc.WebSocket;
 import scala.concurrent.duration.Duration;
@@ -354,7 +347,6 @@ public class Account extends Controller {
         Object user;
         try {
             //Mit dem ObjectMapper versuchen wir den JSON-String in ein Userobjekt umzuwandeln
-            ObjectMapper objectMapper = new ObjectMapper();
             user = Serializer.fromString(jsonData);
 
         } catch (Exception e) {
