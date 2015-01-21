@@ -10,7 +10,7 @@ Um eine stabile, sichere, funktionale und anschauliche Software zu entwickeln, h
 + AJAX + JSON
 	+ Laden der Tabellen für News und Dateien bzw. das Dashboard (Bild: Beispiel-JSON-Daten für die Dateiliste)
 	
-![Per AJAX + JSON geladene Tabelle](images/AjaxJsonFiles.jpg)
+![Per AJAX + JSON geladene Tabelle](images/AjaxJsonFiles.JPG)
 
 + Websockets für die automatische Aktualisierung des Dashboards (Statusbalken, Updateliste, News)
 
