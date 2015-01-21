@@ -27,4 +27,7 @@ Um eine stabile, sichere, funktionale und anschauliche Software zu entwickeln, h
 	+ LESS bzw. CSS für die definition der Styles
 	+ Twitter Bootstrap für ein responsive Design (Kompatibilität für mehrere Endgeräte)
 + "java.io" für den Zugriff auf das lokale Dateisystem
++ "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.1": PlayPlugin zum senden von E-Mails
+	+ Senden des Aktivierungslinks
+	+ Senden der Aktivierungsbestätigung
 
