@@ -4,7 +4,7 @@ Die Idee für das Projekt ergab sich daraus, dass wir festgestellt haben, dass e
 
 ##Mockups
 
-![](/mockups/01_login.png)
+![Login](/mockups/01_login.png)
 
 ##Für uns relevante Probleme die es zu beheben gilt
 
