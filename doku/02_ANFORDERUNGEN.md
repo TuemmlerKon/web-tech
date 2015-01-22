@@ -11,6 +11,8 @@ Requirements Web-Tech
 + Dateiverwaltung
 + Speichern der Dateien nicht lokal sondern bei min. einem ext. Anbieter (z.B. Dropbox oder GoogleDrive) 
 
+Funktionale Anforderungen
+=========================
 Geplante Features für die Zukunft
 ---------------------------------
 
