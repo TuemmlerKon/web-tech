@@ -18,7 +18,7 @@ Funktionale Anforderungen
 + Das System muss zu jeder Zeit dem Nutzer die Dateien zum Download zur verfügen stellen
 
 
-![Use-Case](uml/Use-Case Cloud png.png)
+![Use-Case](uml/Use-Case Cloud jpg.jpg)
 
 
 
