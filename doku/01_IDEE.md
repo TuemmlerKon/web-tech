@@ -5,6 +5,14 @@ Die Idee für das Projekt ergab sich daraus, dass wir festgestellt haben, dass e
 ##Mockups
 
 ![Login](/mockups/01_login.png)
+![Registrierung](/mockups/02_registration.png)
+![Bestätigung](/mockups/03_bestaetigung.png)
+![Aktivierung](/mockups/04_aktivierung.png)
+![Dashboard](/mockups/0501_dashboard.png)
+![Dateiliste](/mockups/0502_dateiliste.png)
+![Einstellungen](/mockups/0503_einstellungen.png)
+![Neuer Anbieter](/mockups/07_neuer_anbieter.png)
+![Anbieter löschen](/mockups/08_anbieter_loeschen.png)
 
 ##Für uns relevante Probleme die es zu beheben gilt
 
