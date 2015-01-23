@@ -10,7 +10,7 @@ Ebenfalls haben wir uns wegen der Schlüsselverwaltung für die Dateiverschlüss
 
 ##Klassendiagramm
 
-HIER FEHLT NOCH EINE INFO
+![Klassendiagramm](/Klassendiagramm/CloudPlex_ClassDiagram_1.jpg)
 
 Nächste Seite: [Endstand](04_ENDSTAND.md)<br/>
 Vorherige Seite: [Anforderungen](02_ANFORDERUNGEN.md)
