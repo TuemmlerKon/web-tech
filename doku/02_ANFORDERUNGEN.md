@@ -43,3 +43,5 @@ Geplante Features für die Zukunft
 + Das System muss vor der Verteilung die Daten mit einem modernen Verschlüsselungsverfahren verschlüsseln
 + Dateien verschlüsselt bei den Hostern ablegen
 
+Nächste Seite: [Architektur](03_ARCHITEKTUR.md)<br/>
+Vorherige Seite: [Idee](01_IDEE.md)

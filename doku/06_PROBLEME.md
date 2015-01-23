@@ -36,3 +36,5 @@ Implementierung eines Rollensystems. Jeder Benutzer hat standardmäßig eine Rol
 		return redirect(controllers.routes.Account.login());
 	}
 
+Nächste Seite: [Fazit](07_FAZIT.md)<br/>
+Vorherige Seite: [Technologien](05_TECHNOLOGIEN.md)
