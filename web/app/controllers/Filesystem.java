@@ -335,7 +335,7 @@ public class Filesystem extends Controller {
         DynamicForm requestData = Form.form().bindFromRequest();
         String foldername = requestData.get("foldername");
         //zuerst müssen wir schauen ob überhaupt etwas übertragen wurde
-        if (foldername == null) {
+        if (foldername == null || foldername.isEmpty()) {
             flash("error", Messages.get("filesystem.folder.error"));
             logger.debug("Filesystem: User submitted empty folder name or an error occured");
             return redirect(controllers.routes.Filesystem.index());
