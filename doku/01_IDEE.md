@@ -24,4 +24,5 @@ Die Idee für das Projekt ergab sich daraus, dass wir festgestellt haben, dass e
 + Überschreitet eine Datei das Größenlimit eines Hosters kann diese nicht hochgeladen werden
 + Meist keine Verschlüsselung und Privatisierung von Dateien möglich
 
-Nachste Seite: ([Anforderungen](02_ANFORDERUNGEN.md))
+
+Nachste Seite: [Anforderungen](02_ANFORDERUNGEN.md)
