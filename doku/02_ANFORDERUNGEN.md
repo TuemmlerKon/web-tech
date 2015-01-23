@@ -25,7 +25,7 @@ Funktionale Anforderungen
 Nichtfunktionale Anforderungen
 ==============================
 + Das System muss 24/7 erreichbar sein
-+ Kurze Latenx Zeiten bei Down- und Upload
++ Kurze Latenzen bei Down- und Upload
 + Ansprechendes Design
 + Kundenfreundlichkeit
 + Sicherheit
