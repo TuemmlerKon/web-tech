@@ -7,3 +7,4 @@ Im Großen und Ganzen haben wir bei diesem Projekt viel mitgenommen und auch vie
 + Auslagerung der Schlüsseldatenbank auf einen externen Server
 + Verteilungslogik für Dateien (Splitten einer Datei auf mehrere Anbieter)
 
+Vorherige Seite: [Probleme](06_PROBLEME.md)
