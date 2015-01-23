@@ -25,4 +25,4 @@ Die Idee für das Projekt ergab sich daraus, dass wir festgestellt haben, dass e
 + Meist keine Verschlüsselung und Privatisierung von Dateien möglich
 
 
-Nachste Seite: [Anforderungen](02_ANFORDERUNGEN.md)
+Nächste Seite: [Anforderungen](02_ANFORDERUNGEN.md)
