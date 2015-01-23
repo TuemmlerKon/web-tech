@@ -35,4 +35,5 @@ Folgend eine Liste aller fertigen und getesteten Funktionen
 Für noch nicht eingebaute Features bzw. zukünftige Ziele bitte den Abschnitt [Meilensteine](07_FAZIT.md#milestones) im Dokument [07_FAZIT.md](07_FAZIT.md) lesen.
 	
 	
-
+Nächste Seite: [Technologien](05_TECHNOLOGIEN.md)<br/>
+Vorherige Seite: [Architektur](03_ARCHITEKTUR.md)
