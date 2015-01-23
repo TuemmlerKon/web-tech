@@ -31,3 +31,5 @@ Um eine stabile, sichere, funktionale und anschauliche Software zu entwickeln, h
 	+ Senden des Aktivierungslinks
 	+ Senden der Aktivierungsbestätigung
 
+Nächste Seite: [Probleme](06_PROBLEME.md)<br/>
+Vorherige Seite: [Endstand](04_ENDSTAND.md)
