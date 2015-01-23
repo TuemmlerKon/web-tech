@@ -17,4 +17,4 @@ Geplante Features für die Zukunft
 + Dateien verschlüsselt bei den Hostern ablegen
 
 Nächste Seite: [Endstand](04_ENDSTAND.md)<br/>
-Vorherige Seite: [Anforderungen](02_Anforderungen.md)
+Vorherige Seite: [Anforderungen](02_ANFORDERUNGEN.md)
