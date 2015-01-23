@@ -14,6 +14,7 @@ user.login.rememberme=Eingeloggt bleiben?
 user.login.email=Deine E-Mailadresse
 user.login.password=Dein Passwort
 user.login.signin=anmelden
+user.login.nodata=Bitte melde dich mit deiner E-Mailadresse und deinem Passwort ein
 user.login.notregistered=Noch nicht registriert?
 user.login.invalidcredentials=Dein Passwort oder dein Benutzername ist falsch. Vielleicht ist dein Konto auch noch nicht aktiviert worden. Bitte prüfe deinen E-Maileingang
 user.login.successful=Login erfolgreich! Herzlich Willkommen {0}!
