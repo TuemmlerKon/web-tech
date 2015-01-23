@@ -47,7 +47,7 @@ public class Security {
             return new CipherInputStream(is, cipher);
         }
 
-        public static void doCopy(InputStream is, OutputStream os) throws IOException {
+        private static void doCopy(InputStream is, OutputStream os) throws IOException {
             byte[] bytes = new byte[64];
             int numBytes;
             while ((numBytes = is.read(bytes)) != -1) {

@@ -50,9 +50,17 @@ public class Account extends Controller {
 
     public static Result loginPost() {
         Form<Login> userForm = Form.form(Login.class);
+
+        if (userForm.hasErrors()) {
+            //Wenn es schon beim Formular ein Problem gab, gehen wir ebenfalls gleich wieder zum Login
+            flash("error", Messages.get("user.login.invalidcredentials"));
+            logger.debug("Login: Form submission error");
+            return redirect(controllers.routes.Account.login());
+        }
+
         Login login = userForm.bindFromRequest().get();
 
-        if (login == null || userForm.hasErrors()) {
+        if (login == null) {
             //Wenn es schon beim Formular ein Problem gab, gehen wir ebenfalls gleich wieder zum Login
             flash("error", Messages.get("user.login.invalidcredentials"));
             logger.debug("Login: Form submission error");
